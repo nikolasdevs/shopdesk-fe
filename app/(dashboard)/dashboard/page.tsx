@@ -1,104 +1,77 @@
 "use client";
 
-import { useEffect, useState,useCallback,useRef,useMemo } from "react";
-import { ChevronDown, Edit, Loader2, MoreVertical, SaveAll, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import EditItemModal from "@/components/modal/edit-stock";
+import LoadingAnimation from "@/components/functional/loading";
+import Logo from "@/components/functional/logo";
+
 import AddItemModal from "@/components/modal/add-item";
 import DeleteItem from "@/components/modal/delete-item";
-import ImageUploader from "@/components/modal/add-image";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import PaginationFeature from "@/components/functional/paginationfeature";
-import { useOrganization } from "@/app/api/useOrganization";
-import { useStore } from "@/store/useStore";
+
+import { getAccessToken } from "@/app/api/token";
+import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
-import Image from "next/image";
-import Logo from "@/components/functional/logo";
-import LoadingAnimation from "@/components/functional/loading";
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import useTableAreaHeight from "./hooks/useTableAreaHeight";
-import { deleteStock,GetProduct, GetStock } from "@/services/stock";
-import { Search } from "lucide-react";
 import box from "@/public/icons/box.svg";
 import {
   ColumnDef,
+  flexRender,
   getCoreRowModel,
   useReactTable,
-  flexRender,
 } from "@tanstack/react-table";
-import { getAccessToken } from "@/app/api/token";
+
+import { deleteStock, GetStock } from "@/services/stock";
+import {
+  ChevronDown,
+  Edit,
+  Loader2,
+  SaveAll,
+  Search,
+  Trash2,
+} from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import useTableAreaHeight from "./hooks/useTableAreaHeight";
+
 import Sidebar from "@/components/functional/sidebar";
+import CreateColumnModal from "@/components/modal/CreateColumn";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
     className?: string;
   }
 }
-  export type StockItem = {
-    id: string;
-    name: string;
-    buying_price: number;
-    quantity: number;
-    currency_code: string;
-    sku?: string;
-    buying_date?: string;
-    product_id?: string;
-    status?: string;
-    user_id?: string;
-    date_created?: string;
-    original_quantity?: number;
-    supplier?: null | any;
-    timeslots?: any[];
-    image?: { id: string; src: string } | null;
-    images?: { id: string; src: string }[];
-  };
-
-export type ProductItem = {
-    name: string;
-  description: string;
-  unique_id: string;
-  url_slug: string;
-  is_available: boolean;
-  is_service: boolean;
-  previous_url_slugs: {};
-  unavailable: false;
-  // "unavailable_start": "2025-03-14T13:14:42.799Z"
-  // "unavailable_end": "2025-03-14T13:14:42.799Z",
-  status: string;
+export type StockItem = {
   id: string;
-  parent_product_id: string;
-  parent: string;
-  organization_id: string;
-  categories: [];
-  date_created: string;
-  last_updated: string;
-  user_id: string;
-  current_price: string;
-  is_deleted: boolean;
-  available_quantity: number;
-  selling_price: number;
-  discounted_price: number;
+  name: string;
   buying_price: number;
-  photos: [];
-  attributes: {};
-  };
+  quantity: number;
+  currency_code: string;
+  sku?: string;
+  buying_date?: string;
+  product_id?: string;
+  status?: string;
+  user_id?: string;
+  date_created?: string;
+  original_quantity?: number;
+  supplier?: null | any;
+  timeslots?: any[];
+};
 
 const Page = () => {
-  const { organizationId, organizationName, organizationInitial } =
-    useStore();
-   
   const { tableAreaRef, tableAreaHeight } = useTableAreaHeight();
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,17 +88,20 @@ const Page = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
-  const [productItems, setProductItems] = useState<ProductItem[]>([]);
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [isEditingTransition, setIsEditingTransition] = useState<string | null>(null);
+  const [isEditingTransition, setIsEditingTransition] = useState<string | null>(
+    null
+  );
   const [editedItem, setEditedItem] = useState<StockItem | null>(null);
   const [activeField, setActiveField] = useState<keyof StockItem | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
   const quantityInputRef = useRef<HTMLInputElement>(null);
-  const filteredItems = stockItems.filter((item) =>   
-      item.name.toLowerCase().includes(searchText.toLowerCase()) || (item.sku && item.sku.toLowerCase().includes(searchText.toLowerCase()))         
+  const filteredItems = stockItems.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      (item.sku && item.sku.toLowerCase().includes(searchText.toLowerCase()))
   );
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -149,83 +125,23 @@ const Page = () => {
 
   const emptyRowsCount = Math.max(0, rowsPerPage - displayedItems.length);
 
-  const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [currentItem, setCurrentItem] = useState<StockItem | null>(null);
-
-  const handleImageClick = (item: StockItem) => {
-    setCurrentItem(item);
-    setImageModalOpen(true);
-  };
-
-  const handleSaveImages = (images: { id: string; src: string }[]) => {
-    if (!currentItem) return;
-
-    const updatedItems = stockItems.map((item) => {
-      if (item.id === currentItem.id) {
-        return {
-          ...item,
-          image: images.length > 0 ? images[0] : null,
-          images: images,
-        };
-      }
-      return item;
-    });
-
-    setStockItems(updatedItems);
-
-    setImageModalOpen(false);
-    setCurrentItem(null);
-  };
-
   useEffect(() => {
     setIsLoading(true);
-    GetProduct()
-    .then((data) => {
-      setIsLoading(false);
-      setProductItems(data.items.map((item: any) => ({
-        ...item, 
-      })));
-        
+    GetStock()
+      .then((data) => {
+        setStockItems(
+          data.items.map((item: any) => ({
+            ...item,
+            sku: item.id.slice(0, 8).toUpperCase() || "N/A",
+          }))
+        );
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching stock:", error);
+        setIsLoading(false);
       });
   }, [router]);
-  
-  useEffect(() => {
-    if (productItems.length === 0) return; 
-    setIsLoading(true);
-  
-    const fetchStocks = async () => {
-      try {
-        const stockData = await Promise.all(
-          productItems.map((product) => GetStock(product.id))
-        );
-  
-        const formattedStockItems = stockData.flatMap((data) =>
-          data.items.map((stock: any) => {
-           
-            const matchingProduct = productItems.find(
-              (product) => product.id === stock.product_id
-            );
-  
-            return {
-              ...stock,
-              sku: matchingProduct?.unique_id,
-            };
-          })
-        );
-  
-        setStockItems(formattedStockItems);
-      } catch (error) {
-        console.error("Error fetching stock:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    fetchStocks();
-  }, [productItems.length]); 
 
   const handleEditClick = (item: StockItem) => {
     setSelectedItem(item);
@@ -237,7 +153,6 @@ const Page = () => {
       prev.map((item) => (item.id === updatedItem.id ? updatedItem : item))
     );
 
-    setSelectedItem({ ...updatedItem });
     setOpenEdit(false);
   };
 
@@ -260,7 +175,7 @@ const Page = () => {
     try {
       await deleteStock(itemId);
       setIsDeleteModalOpen(false);
-      setStockItems((prev) => prev.filter((item) => item.product_id !== itemId));
+      setStockItems((prev) => prev.filter((item) => item.id !== itemId));
     } catch (error) {
       console.error("Error deleting stock:", error);
     }
@@ -305,8 +220,7 @@ const Page = () => {
 
   const handleSaveInline = async () => {
     if (!editedItem) return;
-    
-    const organization_id = useStore.getState().organizationId;
+
     try {
       const token = await getAccessToken();
       setIsEditingTransition(editedItem.id);
@@ -318,7 +232,6 @@ const Page = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          organization_id: organization_id,
           stock_id: editedItem.id,
           name: editedItem.name,
           buying_price: editedItem.buying_price,
@@ -365,89 +278,11 @@ const Page = () => {
   const columns: ColumnDef<StockItem>[] = useMemo(
     () => [
       {
-        accessorKey: "image",
-        header: "IMAGE",
-        size: 80,
-        cell: ({ row }) => {
-          const item = row.original;
-          const hasImage =
-            item.image || (item.images && item.images.length > 0);
-
-          return (
-            <div className="flex items-center justify-center">
-              {hasImage ? (
-                <div
-                  className="w-10 h-10 relative cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageClick(item);
-                  }}
-                >
-                  <img
-                    src={
-                      item.image?.src || (item.images && item.images[0]?.src)
-                    }
-                    alt={item.name}
-                    className="w-full h-full object-cover rounded"
-                  />
-                </div>
-              ) : (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageClick(item);
-                  }}
-                  className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-400 hover:bg-gray-200"
-                >
-                  <span className="text-xs">
-                    <Image 
-                    src="/icons/column-img.svg"
-                    alt="Add Image"
-                    width={20}
-                    height={20}
-                    />
-                  </span>
-                </button>
-              )}
-            </div>
-          );
-        },
-      },
-      {
         accessorKey: "name",
         header: "ITEM NAME",
         size: 200,
         maxSize: 200,
-        cell: ({ row }) => {
-          const isEditingThisRow = editedItem?.id === row.original.id;
-          const isTransitioning = isEditingTransition === row.original.id;
-
-          return (
-            <div 
-              className="w-full h-full flex items-center overflow-hidden"
-              onClick={() => !isEditingThisRow && handleInlineEdit(row.original, "name")}
-            >
-              {isTransitioning ? (
-                <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-              ) : isEditingThisRow ? (
-                <input
-                  ref={nameInputRef}
-                  value={editedItem?.name || ""}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSaveInline()}
-                  className="no-spinner w-full h-full min-w-0 border text-left box-border p-2 focus:outline-[#009A49]"
-                />
-              ) : (
-                <span className="block text-balance p-2">{row.original.name}</span>
-              )}
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "sku",
-        header: "SKU",
-        cell: ({ row }) => {
+        cell: ({ row }: { row: { original: StockItem } }) => {
           const isEditingThisRow = editedItem?.id === row.original.id;
           const isTransitioning = isEditingTransition === row.original.id;
 
@@ -456,8 +291,36 @@ const Page = () => {
               {isTransitioning ? (
                 <Loader2 className="w-4 h-4 animate-spin mx-auto" />
               ) : isEditingThisRow ? (
-                <span className="block truncate">{row.original.sku}</span>
-              ) :(
+                <input
+                  ref={nameInputRef}
+                  value={editedItem?.name || ""}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveInline()}
+                  className="w-full min-w-0 border rounded px-2 py-1 text-left box-border"
+                />
+              ) : (
+                <span className="block text-balance">{row.original.name}</span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "sku",
+        header: "SKU",
+        cell: ({ row }: { row: { original: StockItem } }) => {
+          const isEditingThisRow = editedItem?.id === row.original.id;
+          const isTransitioning = isEditingTransition === row.original.id;
+
+          return (
+            <div className="inline-block w-full overflow-hidden">
+              {isTransitioning ? (
+                <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+              ) : isEditingThisRow ? (
+                <span className="block truncate">
+                  {row.original.id.slice(0, 8).toUpperCase()}
+                </span>
+              ) : (
                 <span className="block truncate">{row.original.sku}</span>
               )}
             </div>
@@ -467,14 +330,17 @@ const Page = () => {
       {
         accessorKey: "buying_price",
         header: "PRICE",
-        cell: ({ row }) => {
+        cell: ({ row }: { row: { original: StockItem } }) => {
           const isEditingThisRow = editedItem?.id === row.original.id;
           const isTransitioning = isEditingTransition === row.original.id;
 
           return (
             <div
-              className="flex w-full h-full items-center justify-center"
-              onClick={() => !isEditingThisRow && handleInlineEdit(row.original, "buying_price")}
+              className="inline-block w-full max-w-[100px]"
+              onClick={() =>
+                !isEditingThisRow &&
+                handleInlineEdit(row.original, "buying_price")
+              }
             >
               {isTransitioning ? (
                 <Loader2 className="w-4 h-4 animate-spin mx-auto" />
@@ -483,13 +349,16 @@ const Page = () => {
                   ref={priceInputRef}
                   type="number"
                   value={editedItem?.buying_price ?? ""}
-                  onChange={(e) => handleInputChange("buying_price", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("buying_price", e.target.value)
+                  }
                   onKeyDown={(e) => e.key === "Enter" && handleSaveInline()}
-                  className="no-spinner w-full h-full border text-center focus:outline-[#009A49]"
+                  className="w-full border rounded px-2 py-1 text-center"
                 />
               ) : (
-                <span className="block w-full overflow-x-clip">{`${row.original.currency_code} ${row.original.buying_price?.toLocaleString()}`}</span>
-                
+                <span className="block w-full overflow-x-clip">{`${
+                  row.original.currency_code
+                } ${row.original.buying_price?.toLocaleString()}`}</span>
               )}
             </div>
           );
@@ -498,14 +367,16 @@ const Page = () => {
       {
         accessorKey: "quantity",
         header: "QUANTITY",
-        cell: ({ row }) => {
+        cell: ({ row }: { row: { original: StockItem } }) => {
           const isEditingThisRow = editedItem?.id === row.original.id;
           const isTransitioning = isEditingTransition === row.original.id;
 
           return (
             <div
-              className="flex h-full w-full items-center justify-center"
-              onClick={() => !isEditingThisRow && handleInlineEdit(row.original, "quantity")}
+              className="inline-block w-[calc(100%-2rem)] max-w-[60px]"
+              onClick={() =>
+                !isEditingThisRow && handleInlineEdit(row.original, "quantity")
+              }
             >
               {isTransitioning ? (
                 <Loader2 className="w-4 h-4 animate-spin mx-auto" />
@@ -514,9 +385,11 @@ const Page = () => {
                   ref={quantityInputRef}
                   type="number"
                   value={editedItem?.quantity ?? ""}
-                  onChange={(e) => handleInputChange("quantity", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("quantity", e.target.value)
+                  }
                   onKeyDown={(e) => e.key === "Enter" && handleSaveInline()}
-                  className="no-spinner w-full h-full border px-2 py-1 text-center focus:outline-[#009A49]"
+                  className="w-full border rounded px-2 py-1 text-center"
                 />
               ) : (
                 row.original.quantity
@@ -529,7 +402,7 @@ const Page = () => {
       {
         id: "actions",
         header: "ACTION",
-        cell: ({ row }) => {
+        cell: ({ row }: { row: { original: StockItem } }) => {
           const item = row.original;
           const isEditingThisRow = editedItem?.id === item.id;
           const isTransitioning = isEditingTransition === row.original.id;
@@ -538,12 +411,12 @@ const Page = () => {
               {isTransitioning ? (
                 <Loader2 className="w-4 h-4 animate-spin mx-auto" />
               ) : isEditingThisRow ? (
-                <div className="flex justify-center items-center gap-2 cursor-pointer"
-                onClick={handleSaveInline}>
+                <div
+                  className="flex justify-center items-center gap-2 cursor-pointer"
+                  onClick={handleSaveInline}
+                >
                   <div className="flex justify-center items-center gap-2 text-[20px]">
-                    <SaveAll
-                      className="cursor-pointer text-black w-[16px] h-[16px]"                      
-                    />
+                    <SaveAll className="cursor-pointer text-black w-[16px] h-[16px]" />
                   </div>
                   <p>Save</p>
                 </div>
@@ -570,8 +443,14 @@ const Page = () => {
     [editedItem, isEditingTransition, handleInlineEdit, handleSaveInline]
   );
   const paginatedData = isSearching
-  ? filteredItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-  : stockItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+    ? filteredItems.slice(
+        (currentPage - 1) * rowsPerPage,
+        currentPage * rowsPerPage
+      )
+    : stockItems.slice(
+        (currentPage - 1) * rowsPerPage,
+        currentPage * rowsPerPage
+      );
 
   const table = useReactTable({
     data: paginatedData,
@@ -610,7 +489,7 @@ const Page = () => {
           onOpenChange={setIsDeleteModalOpen}
           onCancel={() => setIsDeleteModalOpen(false)}
           onDelete={handleDeleteItem}
-          selectedItem={selectedItem ? { product_id: selectedItem.product_id ?? "" } : undefined}
+          selectedItem={selectedItem || undefined}
         />
         <div className="lg:border px-4 py-2 lg:shadow-md rounded-lg lg:flex items-center justify-between mx-auto">
           <div className="flex items-center gap-6">
@@ -623,19 +502,19 @@ const Page = () => {
           </div>
           <div className="">
             <DropdownMenu modal>
-            <DropdownMenuTrigger
+              <DropdownMenuTrigger
                 disabled
                 className="btn-primary hover:cursor-pointer hidden lg:flex items-center gap-2 text-white"
               >
                 <span className="py-2 px-4 rounded-lg bg-white text-black">
-                  {organizationInitial}
+                  SL
                 </span>
-                {organizationName}
+                Sodiq LTD
                 <ChevronDown strokeWidth={1.5} color="white" />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem
-                  className="w-full px-[5rem]"
+                  className="w-full px-[5rem] hidden"
                   onClick={() => setIsLogoutModalOpen(true)}
                 >
                   Log out
@@ -673,20 +552,31 @@ const Page = () => {
                   +
                 </button>
 
-              <div className="relative max-[800px]:w-full">
-                <input type="text" 
-                className="h-12 border w-[327px] max-[800px]:w-full rounded-md focus:outline-2 focus:outline-[#009A49] px-10"
-                onChange={(event)=>{
-                  setIsSearching(true);
-                  setSearchText(event.target.value);
-                  if(!event.target.value){
-                    setIsSearching(false);
-                  }
-                }}/>
+                <div className="relative max-[800px]:w-full">
+                  <input
+                    type="text"
+                    className="h-12 border w-[327px] max-[800px]:w-full rounded-md focus:outline-2 focus:outline-[#009A49] px-10"
+                    onChange={(event) => {
+                      setIsSearching(true);
+                      setSearchText(event.target.value);
+                      if (!event.target.value) {
+                        setIsSearching(false);
+                      }
+                    }}
+                  />
 
-                <Search className="text-[#667085] absolute top-3 left-3 " />
-              </div>
+                  <Search className="text-[#667085] absolute top-3 left-3 " />
+                </div>
 
+                <AddItemModal
+                  isOpen={isOpen}
+                  onClose={closeModal}
+                  onSave={(newItem) => {
+                    setStockItems((prev) => [newItem, ...prev]); // Inserts new items at the top
+
+                    closeModal();
+                  }}
+                />
                 <div className="z-10">
                   <AddItemModal
                     isOpen={isOpen}
@@ -696,17 +586,19 @@ const Page = () => {
 
                       closeModal();
                     }}
-                  />                  
+                  />
                 </div>
-                
-            </div>
+              </div>
             )}
           </div>
           <div className="flex w-full overflow-hidden mx-auto">
-            <div className={`border shadow-md rounded-b-lg rounded-bl-lg relative rounded-tr-lg flex-1 overflow-auto w-full transition-all duration-300 ease-in-out ${
-              isSidebarOpen ? "w-full max-w-[989px] mr-1" : "w-full"
-            }`}>
-            {(stockItems.length === 0 || (isSearching && filteredItems.length === 0)) ? (
+            <div
+              className={`border shadow-md rounded-b-lg rounded-bl-lg relative rounded-tr-lg flex-1 overflow-auto w-full transition-all duration-300 ease-in-out ${
+                isSidebarOpen ? "w-full max-w-[989px] mr-1" : "w-full"
+              }`}
+            >
+              {stockItems.length === 0 ||
+              (isSearching && filteredItems.length === 0) ? (
                 <div className="relative">
                   <Table>
                     <TableHeader>
@@ -759,6 +651,20 @@ const Page = () => {
                               closeModal();
                             }}
                           />
+                          <button
+                            type="button"
+                            onClick={openModal}
+                            className="btn-outline hover:cursor-pointer"
+                          >
+                            + New Column
+                          </button>
+                          <CreateColumnModal
+                            isOpen={isOpen}
+                            onClose={closeModal}
+                            onSave={(newItem) => {
+                              closeModal();
+                            }}
+                          />
                         </div>
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -779,102 +685,117 @@ const Page = () => {
                     </div>
                   </div>
                 </div>
-                ) : (
-              <>
-                <Table className="border-collapse border-b min-w-[590px] table-fixed">
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id} className="h-[50px]">
-                        {headerGroup.headers.map((header) => (
-                          <TableHead
-                            key={header.id}
-                            className={`text-[#090F1C] font-circular-medium text-center border-b border-r min-w-[100px] ${
-                              header.column.id === "name" ? "text-left w-2/7 max-[750px]:w-1/7" : "w-1/7"
-                            } ${header.column.columnDef.meta?.className || ""}`}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>        
-                  <TableBody>
-                    {Array.from({ length: rowsPerPage }).map((_, index) => {
-                      const row = table.getRowModel().rows[index] || null; // Get row or null if not available
-                      return (
-                        <TableRow key={index} className="h-[50px] cursor-pointer" onClick={() => row && handleRowClick(row.original)}>
-                          {row
-                            ? row.getVisibleCells().map((cell) => (
-                                <TableCell
-                                  key={cell.id}
-                                  className={`p-0 py-0 align-middle h-[50px] text-center border-r ${
-                                    cell.column.id === "name" ? "text-left overflow-hidden" : ""
-                                  } ${cell.column.columnDef.meta?.className || ""}`}
-                                >
-                                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </TableCell>
-                              ))
-                            : columns.map((column) => (
-                                <TableCell key={column.id} className="text-center border-r text-gray-400">
-                                  {""} {/* Placeholder for missing row */}
-                                </TableCell>
-                              ))}
+              ) : (
+                <>
+                  <Table className="border-collapse border-b min-w-[590px] table-fixed">
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id} className="h-[50px]">
+                          {headerGroup.headers.map((header) => (
+                            <TableHead
+                              key={header.id}
+                              className={`text-[#090F1C] font-circular-medium px-4 py-2 text-center border-b border-r min-w-[100px] ${
+                                header.column.id === "name"
+                                  ? "text-left w-2/7 max-[750px]:w-1/7"
+                                  : "w-1/7"
+                              } ${
+                                header.column.columnDef.meta?.className || ""
+                              }`}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                            </TableHead>
+                          ))}
                         </TableRow>
-                      );
-                    })}
+                      ))}
+                    </TableHeader>
+                    <TableBody>
+                      {Array.from({ length: rowsPerPage }).map((_, index) => {
+                        const row = table.getRowModel().rows[index] || null; // Get row or null if not available
 
-                  </TableBody>
-                </Table>
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="">
-                        <PaginationFeature
-                          totalItems={isSearching ? filteredItems.length : stockItems.length}
-                          currentPage={currentPage}
-                          itemsPerPage={rowsPerPage}
-                          totalPages={totalPages}
-                          onPageChange={handlePageChange}
-                          onItemsPerPageChange={handleItemsPerPageChange}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>        
-                </Table>                     
-              </>
-            )}                                                                
+                        return (
+                          <TableRow
+                            key={index}
+                            className="h-[50px] cursor-pointer"
+                            onClick={() => row && handleRowClick(row.original)}
+                          >
+                            {row
+                              ? row.getVisibleCells().map((cell) => (
+                                  <TableCell
+                                    key={cell.id}
+                                    className={`px-4 py-3 text-center border-r ${
+                                      cell.column.id === "name"
+                                        ? "text-left overflow-hidden"
+                                        : ""
+                                    } ${
+                                      cell.column.columnDef.meta?.className ||
+                                      ""
+                                    }`}
+                                  >
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext()
+                                    )}
+                                  </TableCell>
+                                ))
+                              : columns.map((column) => (
+                                  <TableCell
+                                    key={column.id}
+                                    className="px-4 py-3 text-center border-r text-gray-400"
+                                  >
+                                    {""} {/* Placeholder for missing row */}
+                                  </TableCell>
+                                ))}
+                          </TableRow>
+                        );
+                      })}
+
+                      {/* Pagination */}
+                    </TableBody>
+                  </Table>
+                  <Table>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="py-4">
+                          <PaginationFeature
+                            totalItems={
+                              isSearching
+                                ? filteredItems.length
+                                : stockItems.length
+                            }
+                            currentPage={currentPage}
+                            itemsPerPage={rowsPerPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            onItemsPerPageChange={handleItemsPerPageChange}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </>
+              )}
             </div>
-              {isSidebarOpen && (
+            {isSidebarOpen && (
               <Sidebar
-                key={
-                  selectedItem?.id + "-" + (selectedItem?.images?.length || 0)
-                }
                 isOpen={isSidebarOpen}
                 onClose={closeSidebar}
                 selectedItem={selectedItem}
                 onSave={handleSaveEdit}
               />
             )}
-            {/*Image Upload Modal */}
-            {imageModalOpen && (
-              <ImageUploader
-                itemName={currentItem?.name || ""}
-                existingImages={currentItem?.images || []}
-                onSave={handleSaveImages}
-                onCancel={() => setImageModalOpen(false)}
-                isOpen={imageModalOpen}
-              />
-            )}
           </div>
         </div>
       </div>
 
-      <EditItemModal
+      {/* <EditItemModal
         isOpen={openEdit}
         onClose={closeEditModal}
         item={selectedItem!}
         onSave={handleSaveEdit}
-      />
+      /> */}
 
       <div className="flex flex-col gap-2 mt-4">
         <p className="text-center mt-4">
