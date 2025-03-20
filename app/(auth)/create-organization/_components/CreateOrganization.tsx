@@ -355,15 +355,15 @@ const CreateOrganization = () => {
             {" "}
             <Image src={logo} alt="logo" width={160} height={10} />
             <motion.div
-              className=" justify-between text-center flex gap-4 mb-6"
+              className=" justify-between md:text-center text-start flex gap-4 md:mb-6"
               variants={itemVariants}
             >
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 md:items-center items-start">
                 <h2 className=" md:text-2xl text-[20px] font-semibold">
                   {" "}
                   Give Your Shop a Name
                 </h2>
-                <p className="md:text-lg text-sm font-normal text-[#717171]">
+                <p className="md:text-lg text-sm w-2/3 md:w-full font-normal text-[#717171] ">
                   This helps us keep your records intact for when you are ready
                   to sign up.
                 </p>
@@ -475,7 +475,7 @@ const CreateOrganization = () => {
                   )}
                 </motion.div>
 
-                <div className="flex w-full gap-10">
+                <div className="flex md:flex-row flex-col w-full md:gap-10 gap-4">
                   {/* Currency Field */}
                   <motion.div className="flex flex-col gap-1 relative w-full">
                     <label
