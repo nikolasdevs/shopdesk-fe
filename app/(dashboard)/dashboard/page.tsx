@@ -38,6 +38,7 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDown, Loader2, Plus, Search, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaSortDown } from "react-icons/fa";
@@ -370,14 +371,11 @@ const Page = () => {
   useEffect(() => {
     if (organizationId === "160db8736a9d47989381e01a987e4413") {
       setIsPremium(true);
-    }  else {
+    } else {
       setIsPremium(false);
     }
-  }, [])
+  }, []);
 
-  
-  
-  
   // if (organizationId !== "160db8736a9d47989381e01a987e4413" &&  stockItems.length >= 10){
   //   setIsPremium(false)
   // }
@@ -749,7 +747,7 @@ const Page = () => {
             <DropdownMenuContent>
               {" "}
               <DropdownMenuItem
-                className=" p-4  w-[200px] "
+                className=" p-4  w-[200px] flex"
                 onClick={() => setIsLogoutModalOpen(true)}
               >
                 {" "}
@@ -760,14 +758,22 @@ const Page = () => {
                 className=" p-4  w-[200px] "
                 onClick={() => setIsLogoutModalOpen(true)}
               >
-                {" "}
-                <Image
-                  src={settings}
-                  alt=""
-                  width={20}
-                  height={20}
-                /> Settings{" "}
-              </DropdownMenuItem>{" "}
+                <Link
+                  href="/dashboard/settings"
+                  target="_"
+                  rel="noopener"
+                  className="flex items-center gap-2"
+                >
+                  <Image
+                    src={settings}
+                    className=""
+                    alt=""
+                    width={20}
+                    height={20}
+                  />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className=" p-4  w-[200px] text-[#ff1925] "
                 onClick={() => setIsLogoutModalOpen(true)}
@@ -803,23 +809,28 @@ const Page = () => {
             {stockItems.length > 0 && (
               <div className="mb-2 max-[800px]:mb-4 max-[640px]:self-end flex items-center justify-center max-[1000px]:flex-row-reverse max-[800px]:w-full">
                 <div className="relative group inline-block">
-  {/* Tooltip */}
-  {!isPremium && stockItems.length >= 10 && (
-    <div className="z-50 absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded-md px-3 py-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-      Upgrade to Premium to add more. 
-      <a href="/pricing" className="text-blue-400 underline ml-1 ">Upgrade now</a>
-    </div>
-  )}
+                  {/* Tooltip */}
+                  {!isPremium && stockItems.length >= 10 && (
+                    <div className="z-50 absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded-md px-3 py-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                      Upgrade to Premium to add more.
+                      <a
+                        href="/pricing"
+                        className="text-blue-400 underline ml-1 "
+                      >
+                        Upgrade now
+                      </a>
+                    </div>
+                  )}
 
-  {/* Button */}
-  <button
-    onClick={openModal}
-    className="btn-primary max-[400px]:text-sm text-nowrap max-[1000px]:hidden mr-2 disabled:opacity-50"
-    disabled={!isPremium && stockItems.length >= 10}
-  >
-    + Add New
-  </button>
-</div>
+                  {/* Button */}
+                  <button
+                    onClick={openModal}
+                    className="btn-primary max-[400px]:text-sm text-nowrap max-[1000px]:hidden mr-2 disabled:opacity-50"
+                    disabled={!isPremium && stockItems.length >= 10}
+                  >
+                    + Add New
+                  </button>
+                </div>
                 <button
                   onClick={openModal}
                   className="btn-primary max-[400px]:text-sm text-nowrap min-[1000px]:hidden ml-2"
