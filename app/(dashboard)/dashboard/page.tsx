@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< Updated upstream
 
 import { getAccessToken } from "@/app/api/token";
 import LoadingAnimation from "@/components/functional/loading";
@@ -12,10 +13,32 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+=======
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
+import { Loader2, Plus, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import EditItemModal from "@/components/modal/edit-stock";
+import AddItemModal from "@/components/modal/add-item";
+import DeleteItem from "@/components/modal/delete-item";
+import ImageUploader from "@/components/modal/add-image";
+import PaginationFeature from "@/components/functional/paginationfeature";
+import { useStore } from "@/store/useStore";
+import { FaSortDown } from "react-icons/fa";
+import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
+import Image from "next/image";
+import LoadingAnimation from "@/components/functional/loading";
+>>>>>>> Stashed changes
 import {
   Table,
   TableBody,
   TableCell,
+<<<<<<< Updated upstream
   TableHead,
   TableHeader,
   TableRow,
@@ -34,6 +57,25 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaSortDown } from "react-icons/fa";
 import useTableAreaHeight from "./hooks/useTableAreaHeight";
 
+=======
+} from "@/components/ui/table";
+import { deleteStock, GetProduct, GetStock } from "@/services/stock";
+import box from "@/public/icons/box.svg";
+import {
+  ColumnDef,
+  getCoreRowModel,
+  useReactTable,
+  flexRender,
+} from "@tanstack/react-table";
+import { getAccessToken } from "@/app/api/token";
+import Sidebar from "@/components/functional/sidebar";
+import StockPreference from "./components/stockpreference";
+import { Button } from "@/components/ui/button";
+// import useTableAreaHeight from "./hooks/useTableAreaHeight";
+// import { Separator } from "@radix-ui/react-dropdown-menu";
+// import SalesTab from "@/components/functional/salestab";
+
+>>>>>>> Stashed changes
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
     className?: string;
@@ -118,9 +160,14 @@ const Page = () => {
   const { tableAreaRef, tableAreaHeight } = useTableAreaHeight();
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+<<<<<<< Updated upstream
   const [organizationInitial, setOrganizationInitial] = useState("");
 
   const [isOpen, setIsOpen] = useState(false);
+=======
+  //Active Tab
+  const [activeTab, setActiveTab] = useState("stock");
+>>>>>>> Stashed changes
   const [openEdit, setOpenEdit] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
 
@@ -134,6 +181,11 @@ const Page = () => {
 
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
+<<<<<<< Updated upstream
+=======
+  const [searchText, setSearchText] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+>>>>>>> Stashed changes
   const [isEditingTransition, setIsEditingTransition] = useState<string | null>(
     null
   );
@@ -318,8 +370,24 @@ const Page = () => {
     setCurrentPage(1);
   };
 
+<<<<<<< Updated upstream
   const handleInputChange = useCallback(
     (field: keyof StockItem, value: string) => {
+=======
+  const handleInlineEdit = useCallback(
+    (item: StockItem, field: keyof StockItem = "name") => {
+      setIsEditingTransition(item.id);
+      setEditedItem({ ...item });
+      setActiveField(field);
+      setIsEditingTransition(null);
+    },
+    []
+  );
+
+  const handleInputChange = useCallback(
+    (field: keyof StockItem, value: string) => {
+      console.log("Input changed:", field, value);
+>>>>>>> Stashed changes
       if (editedItem) {
         setEditedItem((prev) => ({
           ...prev!,
@@ -353,7 +421,13 @@ const Page = () => {
   const handleSaveInline = async () => {
     if (!editedItem) return;
 
+<<<<<<< Updated upstream
     const organization_id = useStore.getState().organizationId;
+=======
+    console.log("Saving inline edit:", editedItem);
+
+    const organization_id = organizationId;
+>>>>>>> Stashed changes
     try {
       const token = await getAccessToken();
       setIsEditingTransition(editedItem.id);
@@ -398,10 +472,25 @@ const Page = () => {
   };
 
   useEffect(() => {
+<<<<<<< Updated upstream
     if (organizationId === "160db8736a9d47989381e01a987e4413") {
       setIsPremium(true);
     } else {
       setIsPremium(false);
+=======
+    if (editedItem && activeField) {
+      switch (activeField) {
+        case "name":
+          nameInputRef.current?.focus();
+          break;
+        case "buying_price":
+          priceInputRef.current?.focus();
+          break;
+        case "quantity":
+          quantityInputRef.current?.focus();
+          break;
+      }
+>>>>>>> Stashed changes
     }
   }, []);
 
@@ -742,6 +831,7 @@ const Page = () => {
     <main className="px-6 py-4 w-full max-w-7xl mx-auto flex flex-col main-h-svh ">
       <div ref={tableAreaRef} className="space-y-8 w-full h-full ">
         <LogoutConfirmModal
+<<<<<<< Updated upstream
           open={isMobileLogoutModalOpen || isDesktopLogoutModalOpen}
           onOpenChange={(open) => {
             if (!open) {
@@ -761,6 +851,13 @@ const Page = () => {
         />
 
         {/* <DeleteItem
+=======
+          open={isLogoutModalOpen}
+          onOpenChange={setIsLogoutModalOpen}
+          onCancel={() => setIsLogoutModalOpen(false)}
+        />
+        <DeleteItem
+>>>>>>> Stashed changes
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           onCancel={() => setIsDeleteModalOpen(false)}
@@ -770,6 +867,7 @@ const Page = () => {
               ? { product_id: selectedItem.product_id ?? "" }
               : undefined
           }
+<<<<<<< Updated upstream
         /> */}
         <div className="lg:border px-4 py-2 lg:shadow-md rounded-lg lg:flex items-center justify-between mx-auto">
           <div className="flex items-center gap-6">
@@ -827,24 +925,97 @@ const Page = () => {
             <div>
               <div className="flex items-center justify-center gap-2 border border-b-white py-2 rounded-tr-lg rounded-tl-lg w-44 max-[800px]:w-full font-semibold px-9 shadow-inner">
                 Stock
+=======
+        />
+        <div className="lg:border px-4 py-2 lg:shadow-md rounded-lg lg:flex items-center justify-between mx-auto">
+          <div className="flex items-center gap-6">
+            {" "}
+            <div className="flex justify-center lg:justify-start w-full lg:w-auto">
+              {" "}
+              <Logo />{" "}
+            </div>{" "}
+            <small className="text-black text-left hidden lg:block">
+              {" "}
+              The simplest way to manage your shop!{" "}
+            </small>{" "}
+          </div>{" "}
+          <DropdownMenu modal>
+            {" "}
+            <DropdownMenuTrigger className="btn-primary hover:cursor-pointer hidden lg:flex items-center gap-2 text-white">
+              {" "}
+              <span className="py-2 px-4 rounded-lg bg-white text-black">
+                {" "}
+                {organizationInitial}{" "}
+              </span>{" "}
+              {organizationName} <ChevronDown strokeWidth={1.5} color="white" />{" "}
+            </DropdownMenuTrigger>{" "}
+            <DropdownMenuContent>
+              {" "}
+              <DropdownMenuItem
+                className=" p-4  w-[200px] "
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
+                {" "}
+                <Image src={viewDeleted} alt="" width={20} height={20} /> View
+                Deleted{" "}
+              </DropdownMenuItem>{" "}
+              <DropdownMenuItem
+                className=" p-4  w-[200px] "
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
+                {" "}
+                <Image
+                  src={settings}
+                  alt=""
+                  width={20}
+                  height={20}
+                /> Settings{" "}
+              </DropdownMenuItem>{" "}
+              <DropdownMenuItem
+                className=" p-4  w-[200px] text-[#ff1925] "
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
+                {" "}
+                <Image src={logout} alt="" width={20} height={20} /> Log out{" "}
+              </DropdownMenuItem>{" "}
+            </DropdownMenuContent>{" "}
+          </DropdownMenu>{" "}
+        </div>{" "}
+        <div className="space-y-0 w-full ">
+          {" "}
+          <div className="w-full flex justify-between max-[800px]:flex-col-reverse">
+            {" "}
+            <div>
+              {" "}
+              <div className="flex items-center justify-center gap-2 border border-b-white py-2 rounded-tr-lg rounded-tl-lg w-44 max-[800px]:w-full font-semibold px-9 shadow-inner">
+                {" "}
+                Stock{" "}
+>>>>>>> Stashed changes
                 <Image
                   src="/icons/ui-box.svg"
                   alt=""
                   width={20}
                   height={20}
                   className="w-5 h-5"
+<<<<<<< Updated upstream
                 />
               </div>
 
               {/*<SalesTab
                // onAddSale={() => {
                 //  console.log("Add sale action triggered");
+=======
+                />{" "}
+              </div>{" "}
+              {/*<SalesTab // onAddSale={() => { //  console.log("Add sale action triggered");
+>>>>>>> Stashed changes
                  // console.log("Active tab:", activeTab);
                 //}}
              // /> */}
             </div>
             {stockItems.length > 0 && (
               <div className="mb-2 max-[800px]:mb-4 max-[640px]:self-end flex items-center justify-center max-[1000px]:flex-row-reverse max-[800px]:w-full">
+<<<<<<< Updated upstream
                 <div className="relative group inline-block">
                   {/* Tooltip */}
                   {!isPremium && stockItems.length >= 10 && (
@@ -868,6 +1039,14 @@ const Page = () => {
                     + Add New
                   </button>
                 </div>
+=======
+                <button
+                  onClick={openModal}
+                  className="btn-primary max-[400px]:text-sm text-nowrap max-[1000px]:hidden mr-2"
+                >
+                  + Add New
+                </button>
+>>>>>>> Stashed changes
                 <button
                   onClick={openModal}
                   className="btn-primary max-[400px]:text-sm text-nowrap min-[1000px]:hidden ml-2"
@@ -894,11 +1073,19 @@ const Page = () => {
                 <div className="z-10">
                   <AddItemModal
                     isOpen={isOpen}
+<<<<<<< Updated upstream
                     onClose={closeAddModal}
                     onSave={(newItem) => {
                       setStockItems((prev) => [newItem, ...prev]); // Inserts new items at the top
 
                       closeAddModal();
+=======
+                    onClose={closeModal}
+                    onSave={(newItem) => {
+                      setStockItems((prev) => [newItem, ...prev]); // Inserts new items at the top
+
+                      closeModal();
+>>>>>>> Stashed changes
                     }}
                   />
                 </div>
@@ -964,10 +1151,17 @@ const Page = () => {
                           </button>
                           <AddItemModal
                             isOpen={isOpen}
+<<<<<<< Updated upstream
                             onClose={closeAddModal}
                             onSave={(newItem) => {
                               setStockItems((prev) => [newItem, ...prev]);
                               closeAddModal();
+=======
+                            onClose={closeModal}
+                            onSave={(newItem) => {
+                              setStockItems((prev) => [newItem, ...prev]);
+                              closeModal();
+>>>>>>> Stashed changes
                             }}
                           />
                         </div>
@@ -1001,6 +1195,7 @@ const Page = () => {
                           {headerGroup.headers.map((header) => {
                             let widthClass = "w-auto"; // Default width of the header columns
 
+<<<<<<< Updated upstream
                             // if (header.column.id === 'name') {
                             //   widthClass =
                             //     showSales && showProfit
@@ -1029,17 +1224,64 @@ const Page = () => {
                             // } else if (header.column.id === 'profitGroup') {
                             //   widthClass = showProfit ? 'w-[350px]' : 'w-auto ';
                             // }
+=======
+                            if (header.column.id === "name") {
+                              widthClass =
+                                showSales && showProfit
+                                  ? "max-w-[259px]"
+                                  : showSales
+                                  ? "max-w-[292px]"
+                                  : showProfit
+                                  ? "max-w-[292px]"
+                                  : "max-w-[374px] pl-4";
+                            } else if (header.column.id === "sell_price") {
+                              widthClass =
+                                showSales && showProfit
+                                  ? "w-auto px-4"
+                                  : showSales || showProfit
+                                  ? "w-[262px]"
+                                  : "w-[280px]";
+                            } else if (header.column.id === "available") {
+                              widthClass =
+                                showSales && showProfit
+                                  ? "w-auto px-4"
+                                  : showSales || showProfit
+                                  ? "w-[206px]"
+                                  : "w-[198px]";
+                            } else if (header.column.id === "sales") {
+                              widthClass = showSales ? "w-[30px]" : "w-auto ";
+                            } else if (header.column.id === "profitGroup") {
+                              widthClass = showProfit ? "w-[350px]" : "w-auto ";
+                            }
+>>>>>>> Stashed changes
 
                             return (
                               <TableHead
                                 key={header.id}
                                 className={`text-[#090F1C] font-circular-medium text-center border-b border-r min-w-[100px] 
+<<<<<<< Updated upstream
     ${
       (showSales && !["name", "sales", "actions"].includes(header.id)) ||
       (showProfit && !["name", "profitGroup", "actions"].includes(header.id))
         ? "hidden sm:table-cell"
         : ""
     } ${widthClass}`}
+=======
+                                ${
+                                  (showSales &&
+                                    !["name", "sales", "actions"].includes(
+                                      header.id
+                                    )) ||
+                                  (showProfit &&
+                                    ![
+                                      "name",
+                                      "profitGroup",
+                                      "actions",
+                                    ].includes(header.id))
+                                    ? "hidden sm:table-cell"
+                                    : ""
+                                } ${widthClass}`}
+>>>>>>> Stashed changes
                               >
                                 {flexRender(
                                   header.column.columnDef.header,
@@ -1058,11 +1300,48 @@ const Page = () => {
                           <TableRow
                             key={index}
                             className="h-[50px] cursor-pointer"
+<<<<<<< Updated upstream
                             // onClick={() => handleRowClick(row.original)}
                           >
                             {row
                               ? row.getVisibleCells().map((cell: any) => {
                                   let cellWidthClass: string = "w-auto"; // Default width
+=======
+                            onClick={() => row && handleRowClick(row.original)}
+                          >
+                            {row
+                              ? row.getVisibleCells().map((cell) => {
+                                  let cellWidthClass = "w-auto"; // Default width
+
+                                  if (cell.column.id === "name") {
+                                    cellWidthClass =
+                                      showSales && showProfit
+                                        ? "w-[259px]"
+                                        : showSales
+                                        ? "w-[292px]"
+                                        : showProfit
+                                        ? "w-[292px]"
+                                        : "w-[374px]";
+                                  } else if (
+                                    cell.column.id === "price" ||
+                                    cell.column.id === "available"
+                                  ) {
+                                    cellWidthClass =
+                                      showSales && showProfit
+                                        ? "w-auto px-4"
+                                        : showSales || showProfit
+                                        ? "w-[262px]"
+                                        : "w-[280px]";
+                                  } else if (cell.column.id === "sales") {
+                                    cellWidthClass = showSales
+                                      ? "w-[356px]"
+                                      : "w-auto px-3";
+                                  } else if (cell.column.id === "profit") {
+                                    cellWidthClass = showProfit
+                                      ? "w-[362px]"
+                                      : "w-auto px-3";
+                                  }
+>>>>>>> Stashed changes
 
                                   return (
                                     <TableCell
@@ -1091,7 +1370,11 @@ const Page = () => {
                                     </TableCell>
                                   );
                                 })
+<<<<<<< Updated upstream
                               : columns.map((column: ColumnDef<StockItem>) => (
+=======
+                              : columns.map((column) => (
+>>>>>>> Stashed changes
                                   <TableCell
                                     key={column.id}
                                     className="text-center border-r text-gray-400"
@@ -1109,7 +1392,11 @@ const Page = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell colSpan={columns.length} className="">
+<<<<<<< Updated upstream
                           {/* <PaginationFeature
+=======
+                          <PaginationFeature
+>>>>>>> Stashed changes
                             totalItems={
                               isSearching
                                 ? filteredItems.length
@@ -1120,7 +1407,11 @@ const Page = () => {
                             totalPages={totalPages}
                             onPageChange={handlePageChange}
                             onItemsPerPageChange={handleItemsPerPageChange}
+<<<<<<< Updated upstream
                           /> */}
+=======
+                          />
+>>>>>>> Stashed changes
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1150,6 +1441,7 @@ const Page = () => {
               />
             )}
           </div>
+<<<<<<< Updated upstream
         </div>
       </div>
 
@@ -1187,6 +1479,50 @@ const Page = () => {
       />
 
       <Footer />
+=======
+          {/* Modals - Logout, DeleteItem, EditItem */}
+          <LogoutConfirmModal
+            open={isLogoutModalOpen}
+            onOpenChange={setIsLogoutModalOpen}
+            onCancel={() => setIsLogoutModalOpen(false)}
+          />
+          <DeleteItem
+            open={isDeleteModalOpen}
+            onOpenChange={setIsDeleteModalOpen}
+            onCancel={() => setIsDeleteModalOpen(false)}
+            onDelete={handleDeleteItem}
+            selectedItem={
+              selectedItem
+                ? { product_id: selectedItem.product_id ?? "" }
+                : undefined
+            }
+          />
+          <EditItemModal
+            isOpen={openEdit}
+            onClose={closeEditModal}
+            item={selectedItem!}
+            onSave={handleSaveEdit}
+          />
+          <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">Test Page</h1>
+            <Button
+              onClick={() => setShowStockPreference(!showStockPreference)}
+              className="px-6 py-3 text-base cursor-pointer"
+            >
+              {showStockPreference
+                ? "Hide Stock Preference"
+                : "Show Stock Preference"}
+            </Button>
+
+            {showStockPreference && (
+              <div className="mt-6">
+                <StockPreference />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+>>>>>>> Stashed changes
     </main>
   );
 };
