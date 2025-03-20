@@ -697,7 +697,6 @@ const Page = () => {
           onOpenChange={setIsLogoutModalOpen}
           onCancel={() => setIsLogoutModalOpen(false)}
         />
-
         <DeleteItem
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
@@ -711,65 +710,76 @@ const Page = () => {
         />
         <div className="lg:border px-4 py-2 lg:shadow-md rounded-lg lg:flex items-center justify-between mx-auto">
           <div className="flex items-center gap-6">
+            {" "}
             <div className="flex justify-center lg:justify-start w-full lg:w-auto">
-              <Logo />
-            </div>
+              {" "}
+              <Logo />{" "}
+            </div>{" "}
             <small className="text-black text-left hidden lg:block">
-              The simplest way to manage your shop!
-            </small>
-          </div>
-
+              {" "}
+              The simplest way to manage your shop!{" "}
+            </small>{" "}
+          </div>{" "}
           <DropdownMenu modal>
+            {" "}
             <DropdownMenuTrigger className="btn-primary hover:cursor-pointer hidden lg:flex items-center gap-2 text-white">
+              {" "}
               <span className="py-2 px-4 rounded-lg bg-white text-black">
-                {organizationInitial}
-              </span>
-              {organizationName}
-              <ChevronDown strokeWidth={1.5} color="white" />
-            </DropdownMenuTrigger>
+                {" "}
+                {organizationInitial}{" "}
+              </span>{" "}
+              {organizationName} <ChevronDown strokeWidth={1.5} color="white" />{" "}
+            </DropdownMenuTrigger>{" "}
             <DropdownMenuContent>
+              {" "}
               <DropdownMenuItem
                 className=" p-4  w-[200px] "
                 onClick={() => setIsLogoutModalOpen(true)}
               >
-                <Image src={viewDeleted} alt="" width={20} height={20} />
-                View Deleted
-              </DropdownMenuItem>
+                {" "}
+                <Image src={viewDeleted} alt="" width={20} height={20} /> View
+                Deleted{" "}
+              </DropdownMenuItem>{" "}
               <DropdownMenuItem
                 className=" p-4  w-[200px] "
                 onClick={() => setIsLogoutModalOpen(true)}
               >
-                <Image src={settings} alt="" width={20} height={20} />
-                Settings
-              </DropdownMenuItem>
+                {" "}
+                <Image
+                  src={settings}
+                  alt=""
+                  width={20}
+                  height={20}
+                /> Settings{" "}
+              </DropdownMenuItem>{" "}
               <DropdownMenuItem
                 className=" p-4  w-[200px] text-[#ff1925] "
                 onClick={() => setIsLogoutModalOpen(true)}
               >
-                <Image src={logout} alt="" width={20} height={20} />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
+                {" "}
+                <Image src={logout} alt="" width={20} height={20} /> Log out{" "}
+              </DropdownMenuItem>{" "}
+            </DropdownMenuContent>{" "}
+          </DropdownMenu>{" "}
+        </div>{" "}
         <div className="space-y-0 w-full ">
+          {" "}
           <div className="w-full flex justify-between max-[800px]:flex-col-reverse">
+            {" "}
             <div>
+              {" "}
               <div className="flex items-center justify-center gap-2 border border-b-white py-2 rounded-tr-lg rounded-tl-lg w-44 max-[800px]:w-full font-semibold px-9 shadow-inner">
-                Stock
+                {" "}
+                Stock{" "}
                 <Image
                   src="/icons/ui-box.svg"
                   alt=""
                   width={20}
                   height={20}
                   className="w-5 h-5"
-                />
-              </div>
-
-              {/*<SalesTab
-               // onAddSale={() => {
-                //  console.log("Add sale action triggered");
+                />{" "}
+              </div>{" "}
+              {/*<SalesTab // onAddSale={() => { //  console.log("Add sale action triggered");
                  // console.log("Active tab:", activeTab);
                 //}}
              // /> */}
