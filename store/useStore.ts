@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 type State = {
   organizationId: string;
@@ -12,27 +12,27 @@ type State = {
 
 const getInitials = (name: string): string => {
   return name
-    .split(" ")
+    .split(' ')
     .map((word) => word.charAt(0).toUpperCase())
-    .join("");
+    .join('');
 };
 
 export const useStore = create<State>()(
   persist(
     (set) => ({
-      organizationId: "",
-      organizationName: "",
-      organizationInitial: "",
+      organizationId: '',
+      organizationName: '',
+      organizationInitial: '',
       setOrganizationId: (organizationId) => set({ organizationId }),
       setOrganizationName: (organizationName) => set({ organizationName }),
-      setOrganizationInitial: (organizationName) => set({ organizationInitial: getInitials(organizationName) }),
+      setOrganizationInitial: (organizationName) =>
+        set({ organizationInitial: getInitials(organizationName) }),
     }),
     {
-      name: "organization-store",
+      name: 'organization-store',
     }
   )
 );
-
 
 /*
 Usage for Stephen
