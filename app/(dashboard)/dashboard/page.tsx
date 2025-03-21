@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { getAccessToken } from "@/app/api/token";
 import LoadingAnimation from "@/components/functional/loading";
@@ -68,7 +69,7 @@ export type ProductItem = {
 };
 
 const Page = () => {
-  const { organizationId, organizationName, organizationInitial } = useStore();
+  const { organizationId, organizationName } = useStore();
 
   const { tableAreaRef, tableAreaHeight } = useTableAreaHeight();
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -168,6 +169,7 @@ const Page = () => {
         setStockItems(formattedStockItems);
       } catch (error) {
         console.error('Error fetching products or stocks:', error);
+        console.error('Error fetching products or stocks:', error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -218,6 +220,7 @@ const Page = () => {
       );
     } catch (error) {
       console.error('Error deleting stock:', error);
+      console.error('Error deleting stock:', error);
     }
   };
 
@@ -239,6 +242,7 @@ const Page = () => {
         setEditedItem((prev) => ({
           ...prev!,
           [field]:
+            field === 'quantity' || field === 'buying_price'
             field === 'quantity' || field === 'buying_price'
               ? Number(value)
               : value,
@@ -277,7 +281,10 @@ const Page = () => {
 
       const response = await fetch('/api/stocks/edit', {
         method: 'PUT',
+      const response = await fetch('/api/stocks/edit', {
+        method: 'PUT',
         headers: {
+          'Content-Type': 'application/json',
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
@@ -293,6 +300,7 @@ const Page = () => {
 
       if (!response.ok) {
         throw new Error('Failed to update stock item');
+        throw new Error('Failed to update stock item');
       }
 
       setStockItems((prevItems) =>
@@ -305,6 +313,8 @@ const Page = () => {
     } catch (error) {
       console.error('Error saving changes:', error);
       alert('Failed to save changes. Please try again.');
+      console.error('Error saving changes:', error);
+      alert('Failed to save changes. Please try again.');
     } finally {
       setIsEditingTransition(null);
     }
@@ -313,6 +323,14 @@ const Page = () => {
   const handleSettingsClick = () => {
     setShowSettings(true);
   };
+
+  useEffect(() => {
+    if (organizationId === '160db8736a9d47989381e01a987e4413') {
+      setIsPremium(true);
+    } else {
+      setIsPremium(false);
+    }
+  }, [])
 
   const handleBackToStock = () => {
     setShowSettings(false);
@@ -324,6 +342,7 @@ const Page = () => {
 
   if (isLoading) {
     return (
+      <div className='flex h-screen items-center justify-center'>
       <div className='flex h-screen items-center justify-center'>
         <LoadingAnimation />
       </div>
@@ -346,6 +365,7 @@ const Page = () => {
           onDelete={handleDeleteItem}
           selectedItem={
             selectedItem
+              ? { product_id: selectedItem.product_id ?? '' }
               ? { product_id: selectedItem.product_id ?? '' }
               : undefined
           }
