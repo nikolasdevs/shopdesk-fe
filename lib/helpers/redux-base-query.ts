@@ -11,7 +11,7 @@ import { useStorage } from './manage-store';
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "/api",
+  baseUrl: '/api',
   prepareHeaders: (headers) => {
     const { getAccessToken } = useStorage();
     const accessToken = getAccessToken();
@@ -44,7 +44,7 @@ export const baseQueryWithReauth: BaseQueryFn<
         const refreshResult = await baseQuery(
           {
             method: 'POST',
-            url: 'core/users/access-token/refresh/',
+            url: 'auth/refresh',
             body: {
               refresh: refreshToken,
             },

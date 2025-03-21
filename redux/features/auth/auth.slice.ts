@@ -7,14 +7,14 @@ interface InitialType {
   isLoading: boolean;
   error: null;
   // TODO: Pay attention to this. this is what controls the whole app endpoint state dynamicity do not go beyond this scope !!!
-  organizationId: string | null;
+  orgId: string | null;
 }
 const initialState: InitialType = {
   isAuthenticated: false,
   user: null,
   isLoading: false,
   error: null,
-  organizationId: null,
+  orgId: null,
 };
 
 const authSlice = createSlice({
@@ -33,17 +33,13 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload.data;
     },
-    setOrganizationId: (state, action) => {
-      state.organizationId = action.payload;
+    setOrgId: (state, action) => {
+      state.orgId = action.payload;
     },
   },
 });
 
-export const {
-  startAuthLoading,
-  authenticationSuccess,
-  setUser,
-  setOrganizationId,
-} = authSlice.actions;
+export const { startAuthLoading, authenticationSuccess, setUser, setOrgId } =
+  authSlice.actions;
 
 export default authSlice.reducer;

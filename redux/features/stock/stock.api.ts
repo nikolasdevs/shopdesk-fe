@@ -28,17 +28,17 @@ export const accessControlApi = api.injectEndpoints({
     //   query: (page = 1) => `stocks/?page=${page}`,
     //   providesTags: ['Stock'],
     // }),
-    // createStock: builder.mutation<
-    //   APIResponse<StockResponse>,
-    //   CreateStockRequest
-    // >({
-    //   query: (values) => ({
-    //     url: 'stocks',
-    //     method: 'POST',
-    //     body: values,
-    //   }),
-    //   invalidatesTags: ['Stock'],
-    // }),
+    createStock: builder.mutation<
+      APIResponse<StockResponse>,
+      CreateStockRequest
+    >({
+      query: (values) => ({
+        url: 'stocks',
+        method: 'POST',
+        body: values,
+      }),
+      invalidatesTags: ['Stock'],
+    }),
     // editStock: builder.mutation<APIResponse<StockResponse>, EditStockRequest>({
     //   query: (values) => ({
     //     url: `stocks/${values.id}`,
@@ -59,7 +59,7 @@ export const accessControlApi = api.injectEndpoints({
 
 export const {
   // useGetStocksQuery,
-  // useCreateStockMutation,
+  useCreateStockMutation,
   // useEditStockMutation,
   // useDeleteStockMutation,
 } = accessControlApi;
