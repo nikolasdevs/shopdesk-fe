@@ -261,40 +261,11 @@ const CreateOrganization = () => {
       return;
     }
 
-<<<<<<< HEAD
     const response = await createOrg({
       ...formData,
       accessToken,
     });
     if ("data" in response) {
-=======
-    setLoading(true);
-
-    const orgData = {
-      name: formData.orgName,
-      currency_code: formData.currency,
-      business_type: formData.businessType,
-      locations: [
-        {
-          country: formData.country,
-          state: formData.state,
-          full_address: `${formData.state} ${formData.country}`,
-        },
-      ],
-    };
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const data = await createOrg(orgData);
-      const organization = await getOrganization();
-      await setOrganizationId(organization?.[0].id || "");
-      await setOrganizationName(organization?.[0].name || "");
-
-      if (!data || data.error) {
-        throw new Error(data?.message || "Unable to create organization.");
-      }
-
->>>>>>> upstream/main
       router.push("/dashboard");
     } else {
       if (response.error && "data" in response.error) {
