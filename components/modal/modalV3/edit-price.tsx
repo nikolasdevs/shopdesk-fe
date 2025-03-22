@@ -1,17 +1,17 @@
-'use client'
-import React, { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
-import { FaTimes, FaChevronDown, FaSearch } from 'react-icons/fa'
-import { currencies } from '../add-item'
-import { editPrice } from '@/services/stock'
-import { StockItem } from '@/app/(dashboard)/dashboard/page'
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { FaTimes, FaChevronDown, FaSearch } from "react-icons/fa";
+import { currencies } from "../add-item";
+//import { editPrice } from '@/services/stock'
+import { StockItem } from "@/app/(dashboard)/dashboard/page";
 
 interface EditPriceModalProps {
-  isOpen: boolean
-  onClose: () => void
-  item: StockItem | null
-  onSave: (updatedPrice: number) => void
-  openSuccessModal: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  item: StockItem | null;
+  onSave: (updatedPrice: number) => void;
+  openSuccessModal: () => void;
 }
 
 export default function EditPriceModal({
@@ -21,64 +21,64 @@ export default function EditPriceModal({
   onSave,
   openSuccessModal,
 }: EditPriceModalProps) {
-  if (!isOpen || !item) return null // Don't render if modal is closed or item is null
+  if (!isOpen || !item) return null; // Don't render if modal is closed or item is null
 
-  const [price, setPrice] = useState(item.buying_price)
-  const [isLoading, setIsLoading] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isCurrencyModalOpen, setCurrencyModalOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const sellingPriceDivRef = useRef<HTMLDivElement>(null)
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [price, setPrice] = useState(item.buying_price);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCurrencyModalOpen, setCurrencyModalOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const sellingPriceDivRef = useRef<HTMLDivElement>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedSellingCurrency, setSelectedSellingCurrency] = useState(
     currencies.find((currency) => currency.code === item.currency_code) ||
-      currencies[0],
-  )
+      currencies[0]
+  );
 
   const filteredCurrencies = currencies.filter((currency) =>
-    currency.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+    currency.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const isFormValid = () => {
-    return price > 0
-  }
+    return price > 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    setIsLoading(true)
+    setIsLoading(true);
 
-    if (validateForm()) {
-      try {
-        await editPrice(item.id, {
-          buying_price: price,
-          currency_code: selectedSellingCurrency.code,
-        })
+    // if (validateForm()) {
+    //   try {
+    //     await editPrice(item.id, {
+    //       buying_price: price,
+    //       currency_code: selectedSellingCurrency.code,
+    //     })
 
-        onSave(price)
-        onClose()
+    //     onSave(price)
+    //     onClose()
 
-        setTimeout(() => {
-          openSuccessModal()
-        }, 500)
-      } catch (error) {
-        console.error('Failed to update price:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-  }
+    //     setTimeout(() => {
+    //       openSuccessModal()
+    //     }, 500)
+    //   } catch (error) {
+    //     console.error('Failed to update price:', error)
+    //   } finally {
+    //     setIsLoading(false)
+    //   }
+    // }
+  };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {}
+    const newErrors: { [key: string]: string } = {};
 
-    if (price <= 0) newErrors.price = 'Price must be greater than 0.'
-    else if (isNaN(Number(price))) newErrors.price = 'Price must be a number.'
+    if (price <= 0) newErrors.price = "Price must be greater than 0.";
+    else if (isNaN(Number(price))) newErrors.price = "Price must be a number.";
 
-    setErrors(newErrors)
+    setErrors(newErrors);
 
-    return Object.keys(newErrors).length === 0
-  }
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Close modal when outside of div is clicked
   useEffect(() => {
@@ -89,22 +89,22 @@ export default function EditPriceModal({
         sellingPriceDivRef.current &&
         !sellingPriceDivRef.current.contains(event.target as Node)
       ) {
-        setCurrencyModalOpen(false)
+        setCurrencyModalOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const toggleCurrencyModal = () => {
-    setCurrencyModalOpen((prev) => !prev)
-  }
+    setCurrencyModalOpen((prev) => !prev);
+  };
 
-  const handleCurrencySelect = (currency: typeof currencies[0]) => {
-    setSelectedSellingCurrency(currency)
-    setCurrencyModalOpen(false)
-  }
+  const handleCurrencySelect = (currency: (typeof currencies)[0]) => {
+    setSelectedSellingCurrency(currency);
+    setCurrencyModalOpen(false);
+  };
 
   return (
     <div className="fixed inset-0 bg-[#24242433] bg-opacity-20 flex items-center justify-center p-4">
@@ -166,17 +166,17 @@ export default function EditPriceModal({
                   name="price"
                   className="w-full h-full p-3 outline-none placeholder:text-[#B8B8B8] text-[#2A2A2A] text-base font-circular-normal"
                   placeholder="Amount"
-                  value={price === 0 ? '' : price}
+                  value={price === 0 ? "" : price}
                   onChange={(e) => {
-                    const value = e.target.value
+                    const value = e.target.value;
                     if (/^\d*$/.test(value)) {
-                      setPrice(value === '' ? 0 : parseFloat(value))
-                      setErrors((prev) => ({ ...prev, price: '' }))
+                      setPrice(value === "" ? 0 : parseFloat(value));
+                      setErrors((prev) => ({ ...prev, price: "" }));
                     } else {
                       setErrors((prev) => ({
                         ...prev,
-                        price: 'Please enter a valid number.',
-                      }))
+                        price: "Please enter a valid number.",
+                      }));
                     }
                   }}
                   required
@@ -215,7 +215,7 @@ export default function EditPriceModal({
                         />
                         <div>
                           <p className="text-[14px] font-circular-normal">
-                            {currency.name} ({currency.code}){' '}
+                            {currency.name} ({currency.code}){" "}
                             <span className="ml-2">{currency.symbol}</span>
                           </p>
                         </div>
@@ -245,12 +245,12 @@ export default function EditPriceModal({
                   type="submit"
                   className={`w-full md:w-auto px-[24px] py-[12px] rounded-[12px] border ${
                     isFormValid()
-                      ? 'bg-black text-white border-black'
-                      : 'bg-[#D0D0D0] text-[#F1F1F1] border-[#B8B8B8]'
+                      ? "bg-black text-white border-black"
+                      : "bg-[#D0D0D0] text-[#F1F1F1] border-[#B8B8B8]"
                   }`}
                   disabled={!isFormValid()}
                 >
-                  {isLoading ? 'Saving...' : 'Save'}
+                  {isLoading ? "Saving..." : "Save"}
                 </button>
               </div>
             </div>
@@ -258,5 +258,5 @@ export default function EditPriceModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -9,7 +9,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { currencies } from "./add-item";
-import { editStock } from "@/services/stock";
+//import { editStock } from "@/services/stock";
 
 interface EditItemModal {
   isOpen: boolean;

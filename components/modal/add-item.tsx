@@ -7,7 +7,7 @@ import {
   FaPlus,
   FaTimes,
 } from "react-icons/fa";
-import { AddStock } from "@/services/stock"; // Import the AddStock function
+//import { AddStock } from "@/services/stock"; // Import the AddStock function
 
 export const currencies = [
   {
@@ -77,6 +77,11 @@ export default function AddStockModal({
   const [costPrice, setCostPrice] = useState('')
   const [quantity, setQuantity] = useState(0);
   const [selectedSellingCurrency, setSelectedSellingCurrency] = useState(
+<<<<<<< HEAD
+    currencies[0]
+  );
+
+=======
     currencies[0],
   )
   const [selectedCostCurrency, setSelectedCostCurrency] = useState(
@@ -86,6 +91,7 @@ export default function AddStockModal({
   'cost' | 'selling' | null
 >(null)
  
+>>>>>>> upstream/main
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -136,7 +142,7 @@ export default function AddStockModal({
         selectedSellingCurrency.code,
         "160db8736a9d47989381e01a987e4413", // Hardcoded organization_id
         new Date().toISOString(),
-        selectedSellingCurrency,
+        selectedSellingCurrency
         // finalSkuCode
       );
 
@@ -146,7 +152,7 @@ export default function AddStockModal({
         name: newStock.name,
         buying_price: newStock.buying_price,
         quantity: newStock.quantity,
-        currency_code: newStock.currency_code
+        currency_code: newStock.currency_code,
       });
 
       // Reset the form fields
@@ -250,6 +256,29 @@ export default function AddStockModal({
                 required
               />
             </div>
+<<<<<<< HEAD
+            <div className="flex  gap-5 flex-1 max-[640px]:flex-col">
+              <div className="flex flex-col gap-[12px] flex-1 relative group">
+                {/* <div className="absolute left-0 bottom-[-30px] bg-[#2A2A2A] text-white text-[12px] py-1 px-3 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                
+              </div> */}
+                <label className="font-circular-normal text-[14px] text-[#717171] text-left">
+                  Cost Price
+                </label>
+                <input
+                  type="text"
+                  name="Cost Price"
+                  className="w-full h-[48px] md:h-[62px] rounded-[9px] p-4 outline-none border border-[#DEDEDE] placeholder:text-[#B8B8B8] text-[#2A2A2A] text-[16px] font-circular-normal"
+                  placeholder="Cost Price"
+                  value={skuCode}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow only alphanumeric characters and hyphens
+                    if (/^[a-zA-Z0-9-]*$/.test(value)) {
+                      setSkuCode(value);
+                    }
+                  }}
+=======
             
  
   <div className="flex flex-col md:flex-row gap-[18px] justify-between">
@@ -310,6 +339,7 @@ export default function AddStockModal({
                   src={currency.flag}
                   alt={`${currency.name} Flag`}
                   className="w-8 h-8 rounded-full object-cover mr-3"
+>>>>>>> upstream/main
                 />
                 <div>
                   <p className="text-[14px] font-circular-normal">
