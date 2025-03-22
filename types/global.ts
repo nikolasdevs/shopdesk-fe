@@ -1,8 +1,11 @@
 export interface PaginatedResponse<T> {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
+  page: number;
+  size: number;
+  total: number;
+  debug: null;
+  previous_page: number | null;
+  next_page: number | null;
+  items: T[];
 }
 export interface PaginatedRequest {
   page: number;

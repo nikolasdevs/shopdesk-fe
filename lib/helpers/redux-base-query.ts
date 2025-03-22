@@ -16,8 +16,10 @@ const baseQuery = fetchBaseQuery({
     const { getAccessToken } = useStorage();
     const accessToken = getAccessToken();
 
+    console.log('accessToken', accessToken);
+
     if (accessToken) {
-      headers.set('Authorization', `Bearer ${accessToken}`);
+      headers.set('Authorization', `${accessToken}`);
     }
     return headers;
   },

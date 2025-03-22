@@ -6,39 +6,43 @@ import type {
 } from '@/types/global';
 
 // TODO: add these in your types.ts see auth.api.ts for more information
-// interface StockBase {
-//   // Types
-// }
+interface StockBase {
+  // Types
+}
 
-// interface CreateStockRequest extends StockBase {
-//   // Types
-// }
+interface CreateStockRequest extends StockBase {
+  // Types
+}
 
-// interface EditStockRequest extends StockBase {
-//   // Types
-// }
+interface EditStockRequest extends StockBase {
+  // Types
+}
 
-// interface StockResponse extends StockBase {
-//   // Types
-// }
+interface StockResponse extends StockBase {
+  // Types
+}
 
 export const accessControlApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // getStocks: builder.query<PaginatedResponse<StockResponse>, number>({
-    //   query: (page = 1) => `stocks/?page=${page}`,
-    //   providesTags: ['Stock'],
-    // }),
-    createStock: builder.mutation<
-      APIResponse<StockResponse>,
-      CreateStockRequest
-    >({
-      query: (values) => ({
-        url: 'stocks',
+    getStocks: builder.mutation<PaginatedResponse<StockResponse>, string>({
+      query: (organizatiohn_id: string) => ({
+        url: `stocks/?organization_id=${organizatiohn_id}`,
         method: 'POST',
-        body: values,
       }),
       invalidatesTags: ['Stock'],
     }),
+
+    // createStock: builder.mutation<
+    //   APIResponse<StockResponse>,
+    //   CreateStockRequest
+    // >({
+    //   query: (values) => ({
+    //     url: 'stocks',
+    //     method: 'POST',
+    //     body: values,
+    //   }),
+    //   invalidatesTags: ['Stock'],
+    // }),
     // editStock: builder.mutation<APIResponse<StockResponse>, EditStockRequest>({
     //   query: (values) => ({
     //     url: `stocks/${values.id}`,
@@ -59,7 +63,9 @@ export const accessControlApi = api.injectEndpoints({
 
 export const {
   // useGetStocksQuery,
-  useCreateStockMutation,
+  // useCreateStockMutation,
   // useEditStockMutation,
   // useDeleteStockMutation,
+
+  useGetStocksMutation,
 } = accessControlApi;

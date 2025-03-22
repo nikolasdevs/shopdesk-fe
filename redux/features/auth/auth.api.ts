@@ -52,6 +52,7 @@ export const authApi = api.injectEndpoints({
     //     },
     //   }),
     // }),
+
     // signup: builder.mutation({
     //   query: (values) => ({
     //     url: '/auth/signup/',
@@ -96,10 +97,10 @@ export const authApi = api.injectEndpoints({
     //     url: `/auth/resend-otp/?email=${email}`,
     //   }),
     // }),
-    // getUser: builder.query<UserType, void>({
-    //   query: () => 'auth/user',
-    //   providesTags: ['User'],
-    // }),
+    getUser: builder.query<UserType, void>({
+      query: () => 'auth/user',
+      providesTags: ['User'],
+    }),
     // editUser: builder.mutation({
     //   query: (updatedData) => ({
     //     url: 'auth/user',
@@ -126,7 +127,7 @@ export const authApi = api.injectEndpoints({
 export const {
   // useLoginMutation,
   // useSignupMutation,
-  // useGetUserQuery,
+  useGetUserQuery,
   // useEditUserMutation,
   // useChangePasswordMutation,
   // useVerifyOtpMutation,

@@ -1,50 +1,34 @@
-import { promises as fs } from 'node:fs';
-import path from 'node:path';
+'use client';
+
+import { useGetStocksMutation } from '@/redux/features/stock/stock.api';
 import { columns } from './components/columns';
 import { DataTable } from './components/data-table';
-import { stockSchema } from './data/schema';
-import { z } from 'zod';
+import { useGetUserQuery } from '@/redux/features/auth/auth.api';
+import { useAppSelector } from '@/redux/hooks';
+import { useEffect } from 'react';
 // import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 // import { useCreateStockMutation } from '@/redux/features/stock/stock.api';
 // import { startStocksLoading } from '@/redux/features/stock/stock.slice';
 
-async function getTasks() {
-  const data = await fs.readFile(
-    path.join(process.cwd(), 'app/(app)/stock/data/stocks.json')
-  );
+export default function StockPage() {
+  const { orgId } = useAppSelector((state) => state.auth);
 
-  const tasks = JSON.parse(data.toString());
+  const [getStock, { data }] = useGetStocksMutation();
 
-  return z.array(stockSchema).parse(tasks);
-}
-
-export default async function StockPage() {
-  const tasks = await getTasks();
-
-  // const { isLoading } = useAppSelector((state) => state.stocks);
-  // const dispatch = useAppDispatch();
-
-  // const [createStock, { is }] = useCreateStockMutation();
-
-  // const handleCreateStock = async () => {
-  //   try {
-  //     dispatch(startStocksLoading());
-  //     await createStock({
-  //       name: 'New Item',
-  //       sell_price: '0.00',
-  //       available: '0',
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //   }
-  // };
-
-  // const { orgId } = useAppSelector((state) => state.auth);
+  useEffect(() => {
+    getStock(orgId ?? '160db8736a9d47989381e01a987e4413')
+      .unwrap()
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   return (
     <div className='container'>
-      <DataTable data={tasks} columns={columns} />
+      {/* <DataTable data={data} columns={columns} /> */}
     </div>
   );
 }
