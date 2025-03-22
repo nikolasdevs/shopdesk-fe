@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { AddStock } from "@/services/stock";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import {
   FaChevronDown,
-  FaSearch,
   FaMinus,
   FaPlus,
+  FaSearch,
   FaTimes,
 } from "react-icons/fa";
 //import { AddStock } from "@/services/stock"; // Import the AddStock function
@@ -74,24 +75,19 @@ export default function AddStockModal({
   const [productName, setProductName] = useState("");
   const [skuCode, setSkuCode] = useState("");
   const [sellingPrice, setSellingPrice] = useState("");
-  const [costPrice, setCostPrice] = useState('')
+  const [costPrice, setCostPrice] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [selectedSellingCurrency, setSelectedSellingCurrency] = useState(
-<<<<<<< HEAD
     currencies[0]
   );
 
-=======
-    currencies[0],
-  )
   const [selectedCostCurrency, setSelectedCostCurrency] = useState(
-    currencies[0],
-  )
+    currencies[0]
+  );
   const [activeDropdown, setActiveDropdown] = useState<
-  'cost' | 'selling' | null
->(null)
- 
->>>>>>> upstream/main
+    "cost" | "selling" | null
+  >(null);
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -106,7 +102,7 @@ export default function AddStockModal({
 
     //if (skuCode.trim() && !/^[a-zA-Z0-9-]+$/.test(skuCode)) {
     //  newErrors.skuCode = "SKU Code must be alphanumeric.";
-   // }
+    // }
 
     setErrors(newErrors);
 
@@ -171,19 +167,19 @@ export default function AddStockModal({
     }
   };
 
-  const toggleCurrencyModal = (dropdown: 'cost' | 'selling') => {
-    setActiveDropdown(dropdown)
-    setCurrencyModalOpen(!isCurrencyModalOpen)
-  }
+  const toggleCurrencyModal = (dropdown: "cost" | "selling") => {
+    setActiveDropdown(dropdown);
+    setCurrencyModalOpen(!isCurrencyModalOpen);
+  };
 
-  const handleCurrencySelect = (currency: typeof currencies[0]) => {
-    if (activeDropdown === 'cost') {
-      setSelectedCostCurrency(currency)
-    } else if (activeDropdown === 'selling') {
-      setSelectedSellingCurrency(currency)
+  const handleCurrencySelect = (currency: (typeof currencies)[0]) => {
+    if (activeDropdown === "cost") {
+      setSelectedCostCurrency(currency);
+    } else if (activeDropdown === "selling") {
+      setSelectedSellingCurrency(currency);
     }
-    setCurrencyModalOpen(false)
-  }
+    setCurrencyModalOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -240,7 +236,7 @@ export default function AddStockModal({
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-[28px]">
             <div className="flex flex-col gap-2">
-             {/*} <label
+              {/*} <label
                 htmlFor="item-name"
                 className="block text-left font-medium text-[#717171] text-[14px]"
               >
@@ -256,193 +252,168 @@ export default function AddStockModal({
                 required
               />
             </div>
-<<<<<<< HEAD
-            <div className="flex  gap-5 flex-1 max-[640px]:flex-col">
-              <div className="flex flex-col gap-[12px] flex-1 relative group">
-                {/* <div className="absolute left-0 bottom-[-30px] bg-[#2A2A2A] text-white text-[12px] py-1 px-3 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                
-              </div> */}
-                <label className="font-circular-normal text-[14px] text-[#717171] text-left">
-                  Cost Price
-                </label>
-                <input
-                  type="text"
-                  name="Cost Price"
-                  className="w-full h-[48px] md:h-[62px] rounded-[9px] p-4 outline-none border border-[#DEDEDE] placeholder:text-[#B8B8B8] text-[#2A2A2A] text-[16px] font-circular-normal"
-                  placeholder="Cost Price"
-                  value={skuCode}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Allow only alphanumeric characters and hyphens
-                    if (/^[a-zA-Z0-9-]*$/.test(value)) {
-                      setSkuCode(value);
-                    }
-                  }}
-=======
-            
- 
-  <div className="flex flex-col md:flex-row gap-[18px] justify-between">
-   {/* this is the cost */}
-  <div className="flex-1">
-    <div className="flex border rounded-[9px] relative">
-      <div
-        className="p-2 flex gap-[8px] items-center cursor-pointer"
-        onClick={() => toggleCurrencyModal('cost')}
-      >
-        <Image
-          src={selectedCostCurrency.flag}
-          alt={`${selectedCostCurrency.name} Flag`}
-          className=""
-          width={20}
-          height={18}
-        />
-        <span className="text-[20px] text-center text-[#595959]">
-          {selectedCostCurrency.symbol}
-        </span>
-        <FaChevronDown className="w-[20px] h-[20px] text-[#888888]" />
-      </div>
-      <div className="h-6 border border-gray self-center mx-2"></div>
-      <div className="flex-1">
-        <input
-          type="text"
-          name="cost-price"
-          className="w-full px-[3px] py-[16px] outline-none placeholder:text-[#B8B8B8] text-[18px] font-circular-normal"
-          placeholder="Cost price / unit"
-          value={costPrice}
-          onChange={(e) => setCostPrice(e.target.value)}
-        />
-      </div>
 
-      {isCurrencyModalOpen && activeDropdown === 'cost' && (
-        <div className="absolute top-full left-0 mt-2 w-[300px] bg-white rounded-lg backdrop-blur-sm border z-50">
-          <div className="relative w-full p-4">
-            <input
-              type="text"
-              name="search"
-              className="w-full rounded-[10px] p-2 pl-[48px] outline-none placeholder:text-[#B8B8B8] text-[16px] border bg-white"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              required
-            />
-            <FaSearch className="absolute left-[32px] top-1/2 transform -translate-y-1/2 text-[#B8B8B8] w-[20px] h-[20px]" />
-          </div>
+            <div className="flex flex-col md:flex-row gap-[18px] justify-between">
+              {/* this is the cost */}
+              <div className="flex-1">
+                <div className="flex border rounded-[9px] relative">
+                  <div
+                    className="p-2 flex gap-[8px] items-center cursor-pointer"
+                    onClick={() => toggleCurrencyModal("cost")}
+                  >
+                    <Image
+                      src={selectedCostCurrency.flag}
+                      alt={`${selectedCostCurrency.name} Flag`}
+                      className=""
+                      width={20}
+                      height={18}
+                    />
+                    <span className="text-[20px] text-center text-[#595959]">
+                      {selectedCostCurrency.symbol}
+                    </span>
+                    <FaChevronDown className="w-[20px] h-[20px] text-[#888888]" />
+                  </div>
+                  <div className="h-6 border border-gray self-center mx-2"></div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      name="cost-price"
+                      className="w-full px-[3px] py-[16px] outline-none placeholder:text-[#B8B8B8] text-[18px] font-circular-normal"
+                      placeholder="Cost price / unit"
+                      value={costPrice}
+                      onChange={(e) => setCostPrice(e.target.value)}
+                    />
+                  </div>
 
-          <div className="h-[200px] overflow-y-auto px-4 bg-[#FFFFFF]">
-            {filteredCurrencies.map((currency) => (
-              <div
-                key={currency.code}
-                className="flex items-center p-2 hover:bg-gray-200 cursor-pointer border-b-1 px-2"
-                onClick={() => handleCurrencySelect(currency)}
-              >
-                <img
-                  src={currency.flag}
-                  alt={`${currency.name} Flag`}
-                  className="w-8 h-8 rounded-full object-cover mr-3"
->>>>>>> upstream/main
-                />
-                <div>
-                  <p className="text-[14px] font-circular-normal">
-                    {currency.name} ({currency.code}){' '}
-                    <span className="ml-2">{currency.symbol}</span>
-                  </p>
+                  {isCurrencyModalOpen && activeDropdown === "cost" && (
+                    <div className="absolute top-full left-0 mt-2 w-[300px] bg-white rounded-lg backdrop-blur-sm border z-50">
+                      <div className="relative w-full p-4">
+                        <input
+                          type="text"
+                          name="search"
+                          className="w-full rounded-[10px] p-2 pl-[48px] outline-none placeholder:text-[#B8B8B8] text-[16px] border bg-white"
+                          placeholder="Search"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          required
+                        />
+                        <FaSearch className="absolute left-[32px] top-1/2 transform -translate-y-1/2 text-[#B8B8B8] w-[20px] h-[20px]" />
+                      </div>
+
+                      <div className="h-[200px] overflow-y-auto px-4 bg-[#FFFFFF]">
+                        {filteredCurrencies.map((currency) => (
+                          <div
+                            key={currency.code}
+                            className="flex items-center p-2 hover:bg-gray-200 cursor-pointer border-b-1 px-2"
+                            onClick={() => handleCurrencySelect(currency)}
+                          >
+                            <img
+                              src={currency.flag}
+                              alt={`${currency.name} Flag`}
+                              className="w-8 h-8 rounded-full object-cover mr-3"
+                            />
+                            <div>
+                              <p className="text-[14px] font-circular-normal">
+                                {currency.name} ({currency.code}){" "}
+                                <span className="ml-2">{currency.symbol}</span>
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-    {/* Error message for Cost Price
+                {/* Error message for Cost Price
     {errors.costPrice && (
       <p className="text-[#FF1925] text-[14px] font-circular-normal text-left mt-1">
         {errors.costPrice}
       </p>
     )}
        */}
-  </div>
-
-  {/* THIS is the selling seciton */}
-  <div className="flex-1">
-    <div className="flex border rounded-[9px] relative">
-      <div
-        className="p-2 flex gap-[8px] items-center cursor-pointer"
-        onClick={() => toggleCurrencyModal('selling')}
-      >
-        <Image
-          src={selectedSellingCurrency.flag}
-          alt={`${selectedSellingCurrency.name} Flag`}
-          className=""
-          width={20}
-          height={18}
-        />
-        <span className="text-[20px] text-center text-[#595959]">
-          {selectedSellingCurrency.symbol}
-        </span>
-        <FaChevronDown className="w-[20px] h-[20px] text-[#888888]" />
-      </div>
-      <div className="h-6 border border-gray self-center mx-2"></div>
-      <div className="flex-1">
-        <input
-          type="text"
-          name="selling-price"
-          className="w-full px-[3px] py-[16px] outline-none placeholder:text-[#B8B8B8] text-[18px] font-circular-normal"
-          placeholder="Selling price / unit"
-          value={sellingPrice}
-          onChange={(e) => setSellingPrice(e.target.value)}
-          required
-        />
-      </div>
-
-      {isCurrencyModalOpen && activeDropdown === 'selling' && (
-        <div className="absolute top-full left-0 mt-2 w-[300px] bg-white rounded-lg backdrop-blur-sm border z-50">
-          <div className="relative w-full p-4">
-            <input
-              type="text"
-              name="quesry"
-              className="w-full rounded-[10px] p-2 pl-[48px] outline-none placeholder:text-[#B8B8B8] text-[16px] border bg-white"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              required
-            />
-            <FaSearch className="absolute left-[32px] top-1/2 transform -translate-y-1/2 text-[#B8B8B8] w-[20px] h-[20px]" />
-          </div>
-
-          <div className="h-[200px] overflow-y-auto custom-scrollbar px-[20px] hover:bg-gray-200 bg-[#FFFFFF]">
-            {filteredCurrencies.map((currency) => (
-              <div
-                key={currency.code}
-                className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
-                onClick={() => handleCurrencySelect(currency)}
-              >
-                <img
-                  src={currency.flag}
-                  alt={`${currency.name} Flag`}
-                  className="w-8 h-8 rounded-full object-cover mr-3"
-                />
-                <div>
-                  <p className="text-[14px] font-circular-normal">
-                    {currency.name} ({currency.code})
-                    <span className="ml-2">{currency.symbol}</span>
-                  </p>
-                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-    {errors.sellingPrice && (
-      <p className="text-[#FF1925] text-[14px] font-circular-normal text-left mt-1">
-        {errors.sellingPrice}
-      </p>
-    )}
-  </div>
-</div>
-  
+
+              {/* THIS is the selling seciton */}
+              <div className="flex-1">
+                <div className="flex border rounded-[9px] relative">
+                  <div
+                    className="p-2 flex gap-[8px] items-center cursor-pointer"
+                    onClick={() => toggleCurrencyModal("selling")}
+                  >
+                    <Image
+                      src={selectedSellingCurrency.flag}
+                      alt={`${selectedSellingCurrency.name} Flag`}
+                      className=""
+                      width={20}
+                      height={18}
+                    />
+                    <span className="text-[20px] text-center text-[#595959]">
+                      {selectedSellingCurrency.symbol}
+                    </span>
+                    <FaChevronDown className="w-[20px] h-[20px] text-[#888888]" />
+                  </div>
+                  <div className="h-6 border border-gray self-center mx-2"></div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      name="selling-price"
+                      className="w-full px-[3px] py-[16px] outline-none placeholder:text-[#B8B8B8] text-[18px] font-circular-normal"
+                      placeholder="Selling price / unit"
+                      value={sellingPrice}
+                      onChange={(e) => setSellingPrice(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {isCurrencyModalOpen && activeDropdown === "selling" && (
+                    <div className="absolute top-full left-0 mt-2 w-[300px] bg-white rounded-lg backdrop-blur-sm border z-50">
+                      <div className="relative w-full p-4">
+                        <input
+                          type="text"
+                          name="quesry"
+                          className="w-full rounded-[10px] p-2 pl-[48px] outline-none placeholder:text-[#B8B8B8] text-[16px] border bg-white"
+                          placeholder="Search"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          required
+                        />
+                        <FaSearch className="absolute left-[32px] top-1/2 transform -translate-y-1/2 text-[#B8B8B8] w-[20px] h-[20px]" />
+                      </div>
+
+                      <div className="h-[200px] overflow-y-auto custom-scrollbar px-[20px] hover:bg-gray-200 bg-[#FFFFFF]">
+                        {filteredCurrencies.map((currency) => (
+                          <div
+                            key={currency.code}
+                            className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                            onClick={() => handleCurrencySelect(currency)}
+                          >
+                            <img
+                              src={currency.flag}
+                              alt={`${currency.name} Flag`}
+                              className="w-8 h-8 rounded-full object-cover mr-3"
+                            />
+                            <div>
+                              <p className="text-[14px] font-circular-normal">
+                                {currency.name} ({currency.code})
+                                <span className="ml-2">{currency.symbol}</span>
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {errors.sellingPrice && (
+                  <p className="text-[#FF1925] text-[14px] font-circular-normal text-left mt-1">
+                    {errors.sellingPrice}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div className="flex flex-col gap-[8px]">
-            {/* <label className="font-circular-normal text-[14px] text-[#1B1B1B] text-left">
+              {/* <label className="font-circular-normal text-[14px] text-[#1B1B1B] text-left">
                 Quantity <span className="text-[#FF1925]">*</span>
               </label>*/}
               <div className="flex items-center gap-[8px]">

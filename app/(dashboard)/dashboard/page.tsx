@@ -3,7 +3,7 @@
 import { getAccessToken } from "@/app/api/token";
 import LoadingAnimation from "@/components/functional/loading";
 
-import DeleteItem from "@/components/modal/delete-item";
+import AddItemModal from "@/components/modal/add-item";
 import EditItemModal from "@/components/modal/edit-stock";
 import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
 import {
@@ -29,12 +29,10 @@ import { useStore } from "@/store/useStore";
 
 import { useRouter } from "next/navigation";
 
-import { useCallback, useEffect, useState } from "react";
-
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaSortDown } from "react-icons/fa";
 import useTableAreaHeight from "./hooks/useTableAreaHeight";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
@@ -44,11 +42,16 @@ declare module "@tanstack/react-table" {
 }
 
 import Footer from "./components/Footer";
-import Header from "./components/Header";
 import Settings from "./components/Settings";
 
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ChevronDown, Loader2, Plus, Search, X } from "lucide-react";
 import TableContent from "./components/TableContent";
-import useTableAreaHeight from "./hooks/useTableAreaHeight";
 
 export type StockItem = {
   id: string;
@@ -99,8 +102,18 @@ export type ProductItem = {
   attributes: {};
 };
 
+import Logo from "@/components/functional/logo";
+import Sidebar from "@/components/functional/sidebar";
+import ImageUploader from "@/components/modal/add-image";
+import Image from "next/image";
+import Link from "next/link";
+import { useRef } from "react";
+
 const Page = () => {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const priceInputRef = useRef<HTMLInputElement>(null);
   const { organizationId, organizationName } = useStore();
+  const quantityInputRef = useRef<HTMLInputElement>(null);
 
   const { tableAreaRef, tableAreaHeight } = useTableAreaHeight();
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -116,6 +129,7 @@ const Page = () => {
   const [isMobileLogoutModalOpen, setIsMobileLogoutModalOpen] = useState(false);
   const [isDesktopLogoutModalOpen, setIsDesktopLogoutModalOpen] =
     useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
@@ -123,11 +137,14 @@ const Page = () => {
   const [isEditingTransition, setIsEditingTransition] = useState<string | null>(
     null
   );
+  const [searchText, setSearchText] = useState<string>("");
   const [editedItem, setEditedItem] = useState<StockItem | null>(null);
   const [activeField, setActiveField] = useState<keyof StockItem | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showSales, setShowSales] = useState(false);
 
   const [showProfit, setShowProfit] = useState(false);
 
@@ -160,6 +177,7 @@ const Page = () => {
   };
 
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const router = useRouter();
 
@@ -681,6 +699,10 @@ const Page = () => {
       toggleProfit,
     ]
   );
+  const filteredItems = stockItems.filter((item) =>
+    item.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   const paginatedData = isSearching
     ? filteredItems.slice(
         (currentPage - 1) * rowsPerPage,
@@ -705,11 +727,21 @@ const Page = () => {
     );
   }
 
+  function closeSidebar(): void {
+    throw new Error("Function not implemented.");
+  }
+
+  function openModal(): void {
+    setOpenAdd(true);
+  }
+  function handleBackToStock(event: React.MouseEvent<HTMLButtonElement>): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <main className="px-6 py-4 w-full max-w-7xl mx-auto flex flex-col main-h-svh ">
       <div ref={tableAreaRef} className="space-y-8 w-full h-full ">
         <LogoutConfirmModal
-          organizationName={organizationName}
           open={isMobileLogoutModalOpen || isDesktopLogoutModalOpen}
           onOpenChange={(open) => {
             if (!open) {
@@ -862,11 +894,11 @@ const Page = () => {
                 <div className="z-10">
                   <AddItemModal
                     isOpen={isOpen}
-                    onClose={closeModal}
+                    onClose={closeAddModal}
                     onSave={(newItem) => {
                       setStockItems((prev) => [newItem, ...prev]); // Inserts new items at the top
 
-                      closeModal();
+                      closeAddModal();
                     }}
                   />
                 </div>
@@ -932,10 +964,10 @@ const Page = () => {
                           </button>
                           <AddItemModal
                             isOpen={isOpen}
-                            onClose={closeModal}
+                            onClose={closeAddModal}
                             onSave={(newItem) => {
                               setStockItems((prev) => [newItem, ...prev]);
-                              closeModal();
+                              closeAddModal();
                             }}
                           />
                         </div>
@@ -1029,37 +1061,8 @@ const Page = () => {
                             // onClick={() => handleRowClick(row.original)}
                           >
                             {row
-                              ? row.getVisibleCells().map((cell) => {
-                                  let cellWidthClass = "w-auto"; // Default width
-
-                                  // if (cell.column.id === 'name') {
-                                  //   cellWidthClass =
-                                  //     showSales && showProfit
-                                  //       ? 'w-[259px]'
-                                  //       : showSales
-                                  //         ? 'w-[292px]'
-                                  //         : showProfit
-                                  //           ? 'w-[292px]'
-                                  //           : 'w-[374px]';
-                                  // } else if (
-                                  //   cell.column.id === 'price' ||
-                                  //   cell.column.id === 'available'
-                                  // ) {
-                                  //   cellWidthClass =
-                                  //     showSales && showProfit
-                                  //       ? 'w-auto px-4'
-                                  //       : showSales || showProfit
-                                  //         ? 'w-[262px]'
-                                  //         : 'w-[280px]';
-                                  // } else if (cell.column.id === 'sales') {
-                                  //   cellWidthClass = showSales
-                                  //     ? 'w-[356px]'
-                                  //     : 'w-auto px-3';
-                                  // } else if (cell.column.id === 'profit') {
-                                  //   cellWidthClass = showProfit
-                                  //     ? 'w-[362px]'
-                                  //     : 'w-auto px-3';
-                                  // }
+                              ? row.getVisibleCells().map((cell: any) => {
+                                  let cellWidthClass: string = "w-auto"; // Default width
 
                                   return (
                                     <TableCell
@@ -1088,7 +1091,7 @@ const Page = () => {
                                     </TableCell>
                                   );
                                 })
-                              : columns.map((column) => (
+                              : columns.map((column: ColumnDef<StockItem>) => (
                                   <TableCell
                                     key={column.id}
                                     className="text-center border-r text-gray-400"
