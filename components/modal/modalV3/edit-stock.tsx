@@ -1,16 +1,16 @@
-'use client'
-import { useState } from 'react'
-import Image from 'next/image'
-import { FaTimes, FaMinus, FaPlus } from 'react-icons/fa'
-import { editStockv3 } from '@/services/stock'
-import { StockItem } from '@/app/(dashboard)/dashboard/page'
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
+//import { editStockv3 } from '@/services/stock'
+import { StockItem } from "@/app/(dashboard)/dashboard/page";
 
 interface EditStockV3ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  item: StockItem | null
-  onSave: (updatedItem: StockItem) => void
-  openSuccessModal: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  item: StockItem | null;
+  onSave: (updatedItem: StockItem) => void;
+  openSuccessModal: () => void;
 }
 
 export default function EditStockV3Modal({
@@ -20,60 +20,61 @@ export default function EditStockV3Modal({
   onSave,
   openSuccessModal,
 }: EditStockV3ModalProps) {
-  if (!isOpen || !item) return null // Don't render if modal is closed or item is null
+  if (!isOpen || !item) return null; // Don't render if modal is closed or item is null
 
-  const [productName, setProductName] = useState(item.name)
-  const [quantity, setQuantity] = useState(item.quantity)
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [isLoading, setIsLoading] = useState(false)
+  const [productName, setProductName] = useState(item.name);
+  const [quantity, setQuantity] = useState(item.quantity);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {}
+    const newErrors: { [key: string]: string } = {};
 
-    if (!productName.trim()) newErrors.productName = 'Product Name is required.'
+    if (!productName.trim())
+      newErrors.productName = "Product Name is required.";
 
-    if (quantity <= 0) newErrors.quantity = 'Quantity must be greater than 0.'
+    if (quantity <= 0) newErrors.quantity = "Quantity must be greater than 0.";
 
-    setErrors(newErrors)
+    setErrors(newErrors);
 
-    return Object.keys(newErrors).length === 0
-  }
+    return Object.keys(newErrors).length === 0;
+  };
 
-  const increment = () => setQuantity((prev) => prev + 1)
-  const decrement = () => setQuantity((prev) => (prev > 0 ? prev - 1 : 0))
+  const increment = () => setQuantity((prev) => prev + 1);
+  const decrement = () => setQuantity((prev) => (prev > 0 ? prev - 1 : 0));
 
   const isFormValid = () => {
-    return productName && quantity > 0
-  }
+    return productName && quantity > 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    setIsLoading(true)
+    setIsLoading(true);
 
-    if (validateForm()) {
-      try {
-        await editStockv3(item.id, {
-          name: productName,
-          quantity: quantity,
-        })
-        onSave({
-          ...item,
-          name: productName,
-          quantity: quantity,
-        })
+    // if (validateForm()) {
+    //   try {
+    //     await editStockv3(item.id, {
+    //       name: productName,
+    //       quantity: quantity,
+    //     })
+    //     onSave({
+    //       ...item,
+    //       name: productName,
+    //       quantity: quantity,
+    //     })
 
-        onClose()
-        setTimeout(() => {
-          openSuccessModal()
-        }, 1000)
-      } catch (error) {
-        console.error('Failed to update stock:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-  }
+    //     onClose()
+    //     setTimeout(() => {
+    //       openSuccessModal()
+    //     }, 1000)
+    //   } catch (error) {
+    //     console.error('Failed to update stock:', error)
+    //   } finally {
+    //     setIsLoading(false)
+    //   }
+    // }
+  };
 
   return (
     <div className="fixed inset-0 bg-[#24242433] bg-opacity-20 flex items-center justify-center p-4">
@@ -120,7 +121,7 @@ export default function EditStockV3Modal({
                 name="item-name"
                 className="w-full h-[48px] md:h-[62px] rounded-[9px] p-[12px] outline-none border border-[#DEDEDE] focus:outline-none focus:ring-2 focus:ring-[#CCEBDB] focus:border-[#009A49] hover:ring-2 hover:ring-[#CCEBDB] transition-all placeholder:text-[#B8B8B8] text-[#2A2A2A] text-[16px] font-circular-normal bg-white"
                 placeholder="Item Name"
-                value={productName ?? ''}
+                value={productName ?? ""}
                 onChange={(e) => setProductName(e.target.value)}
                 required
               />
@@ -167,18 +168,18 @@ export default function EditStockV3Modal({
                     inputMode="numeric"
                     className="w-full h-[48px] md:h-[62px] rounded-[9px] p-[12px] outline-none border border-[#DEDEDE] focus:outline-none focus:ring-2 focus:ring-[#CCEBDB] focus:border-[#009A49] hover:ring-2 hover:ring-[#CCEBDB] transition-all placeholder:text-[#B8B8B8] text-[#2A2A2A] text-[16px] font-circular-normal text-center"
                     placeholder="Quantity"
-                    value={quantity === 0 ? '' : quantity}
+                    value={quantity === 0 ? "" : quantity}
                     onChange={(e) => {
-                      const value = e.target.value
+                      const value = e.target.value;
 
                       if (/^\d*$/.test(value)) {
-                        setQuantity(value === '' ? 0 : parseInt(value, 10))
-                        setErrors((prev) => ({ ...prev, quantity: '' }))
+                        setQuantity(value === "" ? 0 : parseInt(value, 10));
+                        setErrors((prev) => ({ ...prev, quantity: "" }));
                       } else {
                         setErrors((prev) => ({
                           ...prev,
-                          quantity: 'Please enter a valid number.',
-                        }))
+                          quantity: "Please enter a valid number.",
+                        }));
                       }
                     }}
                     required
@@ -215,12 +216,12 @@ export default function EditStockV3Modal({
                   type="submit"
                   className={`w-full md:w-auto px-[24px] py-[12px] rounded-[12px] border ${
                     isFormValid()
-                      ? 'bg-black text-white border-black'
-                      : 'bg-[#D0D0D0] text-[#F1F1F1] border-[#B8B8B8]'
+                      ? "bg-black text-white border-black"
+                      : "bg-[#D0D0D0] text-[#F1F1F1] border-[#B8B8B8]"
                   }`}
                   disabled={!isFormValid()}
                 >
-                  {isLoading ? 'Saving...' : 'Save'}
+                  {isLoading ? "Saving..." : "Save"}
                 </button>
               </div>
             </div>
@@ -228,5 +229,5 @@ export default function EditStockV3Modal({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -7,7 +7,7 @@ import {
   FaPlus,
   FaTimes,
 } from "react-icons/fa";
-import { AddStock } from "@/services/stock"; // Import the AddStock function
+//import { AddStock } from "@/services/stock"; // Import the AddStock function
 
 export const currencies = [
   {
@@ -79,7 +79,6 @@ export default function AddStockModal({
     currencies[0]
   );
 
- 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -130,7 +129,7 @@ export default function AddStockModal({
         selectedSellingCurrency.code,
         "160db8736a9d47989381e01a987e4413", // Hardcoded organization_id
         new Date().toISOString(),
-        selectedSellingCurrency,
+        selectedSellingCurrency
         // finalSkuCode
       );
 
@@ -140,7 +139,7 @@ export default function AddStockModal({
         name: newStock.name,
         buying_price: newStock.buying_price,
         quantity: newStock.quantity,
-        currency_code: newStock.currency_code
+        currency_code: newStock.currency_code,
       });
 
       // Reset the form fields
@@ -240,11 +239,11 @@ export default function AddStockModal({
             </div>
             <div className="flex  gap-5 flex-1 max-[640px]:flex-col">
               <div className="flex flex-col gap-[12px] flex-1 relative group">
-              {/* <div className="absolute left-0 bottom-[-30px] bg-[#2A2A2A] text-white text-[12px] py-1 px-3 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                {/* <div className="absolute left-0 bottom-[-30px] bg-[#2A2A2A] text-white text-[12px] py-1 px-3 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                 
               </div> */}
                 <label className="font-circular-normal text-[14px] text-[#717171] text-left">
-                Cost Price
+                  Cost Price
                 </label>
                 <input
                   type="text"
@@ -259,7 +258,6 @@ export default function AddStockModal({
                       setSkuCode(value);
                     }
                   }}
-                  
                 />
                 {errors.skuCode && (
                   <p className="text-[#FF1925] text-sm font-circular-normal">

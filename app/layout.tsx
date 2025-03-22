@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import ReduxProvider from "@/components/providers/ReduxProvider";
 import "@/styles/globals.css";
+import type { Metadata } from "next";
 
 const APP_URL = "https://www.shopdesk.im";
 const APP_NAME = "ShopDesk";
@@ -75,7 +76,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <ReduxProvider>
+        <body>{children}</body>
+      </ReduxProvider>
     </html>
   );
 }

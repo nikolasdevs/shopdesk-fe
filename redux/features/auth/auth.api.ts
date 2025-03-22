@@ -1,5 +1,7 @@
-import { api } from '@/redux/api';
-import type { UserType } from '@/types/user';
+import { api } from "@/redux/api";
+import { store, type RootState } from "@/redux/store";
+import type { OrgType } from "@/types/org";
+import type { UserType } from "@/types/user";
 
 // TODO: Ensure uou add your response and request types in a types.ts file in the same folder e.g (SignupResponse, SignupRequest) see below for more details
 // interface UserBase {
@@ -39,28 +41,43 @@ import type { UserType } from '@/types/user';
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
-
     // TODO: all your endpoints must be typed
 
-    // login: builder.mutation({
-    //   query: ({ email, password }) => ({
-    //     url: '/auth/login/',
-    //     method: 'POST',
-    //     body: {
-    //       email,
-    //       password,
-    //     },
-    //   }),
-    // }),
+    login: builder.mutation<
+      { token: string; user: UserType },
+      { email: string; password: string }
+    >({
+      query: ({ email, password }) => ({
+        url: "/auth/login/",
+        method: "POST",
+        body: {
+          email,
+          password,
+        },
+      }),
+    }),
 
-    // signup: builder.mutation({
-    //   query: (values) => ({
-    //     url: '/auth/signup/',
-    //     method: 'POST',
-    //     body: values,
-    //   }),
-    // }),
+    signup: builder.mutation({
+      query: (values) => ({
+        url: "/auth/signup/",
+        method: "POST",
+        body: values,
+      }),
+    }),
 
+    createOrg: builder.mutation<OrgType, Partial<OrgType>>({
+      query: (values) => {
+        const token = (store.getState() as RootState).auth.token;
+        return {
+          url: "/organizations/",
+          method: "POST",
+          body: values,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+      },
+    }),
     // // NOTE: This is not exactly correct look into the docs and figure out if it's needed
     // verifyOtp: builder.mutation({
     //   query: ({ email, otp_token }) => ({
@@ -98,8 +115,8 @@ export const authApi = api.injectEndpoints({
     //   }),
     // }),
     getUser: builder.query<UserType, void>({
-      query: () => 'auth/user',
-      providesTags: ['User'],
+      query: () => "auth/user",
+      providesTags: ["User"],
     }),
     // editUser: builder.mutation({
     //   query: (updatedData) => ({
@@ -125,9 +142,10 @@ export const authApi = api.injectEndpoints({
 });
 
 export const {
-  // useLoginMutation,
-  // useSignupMutation,
+  useLoginMutation,
+  useSignupMutation,
   useGetUserQuery,
+  useCreateOrgMutation,
   // useEditUserMutation,
   // useChangePasswordMutation,
   // useVerifyOtpMutation,
