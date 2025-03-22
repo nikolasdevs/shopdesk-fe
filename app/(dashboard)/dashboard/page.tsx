@@ -1,5 +1,4 @@
-'use client';
-'use client';
+"use client";
 
 import { getAccessToken } from "@/app/api/token";
 import LoadingAnimation from "@/components/functional/loading";
@@ -146,36 +145,35 @@ const Page = () => {
     let isMounted = true; // Prevents state updates if component unmounts
     //setIsLoading(true);
 
-    const fetchProductsAndStocks = async () => {
-      try {
-        // Fetch products
-        const productData: any = await GetProduct();
-        if (!isMounted) return; // Prevent state update if unmounted
-        setProductItems(productData.items);
+    // const fetchProductsAndStocks = async () => {
+    //   try {
+    //     // Fetch products
+    //     const productData: any = await GetProduct();
+    //     if (!isMounted) return; // Prevent state update if unmounted
+    //     setProductItems(productData.items);
 
-        // Fetch stock for each product
-        const stockData = await Promise.all(
-          productData.items.map((product: any) => GetStock(product.id))
-        );
+    //     // Fetch stock for each product
+    //     const stockData = await Promise.all(
+    //       productData.items.map((product: any) => GetStock(product.id))
+    //     );
 
-        if (!isMounted) return;
-        const formattedStockItems = stockData.flatMap((data, index) =>
-          data.items.map((stock: any) => ({
-            ...stock,
-            sku: productData.items[index]?.unique_id,
-          }))
-        );
+    //     if (!isMounted) return;
+    //     const formattedStockItems = stockData.flatMap((data, index) =>
+    //       data.items.map((stock: any) => ({
+    //         ...stock,
+    //         sku: productData.items[index]?.unique_id,
+    //       }))
+    //     );
 
-        setStockItems(formattedStockItems);
-      } catch (error) {
-        console.error('Error fetching products or stocks:', error);
-        console.error('Error fetching products or stocks:', error);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
+    //     setStockItems(formattedStockItems);
+    //   } catch (error) {
+    //     console.error("Error fetching products or stocks:", error);
+    //   } finally {
+    //     if (isMounted) setIsLoading(false);
+    //   }
+    // };
 
-    fetchProductsAndStocks();
+    // fetchProductsAndStocks();
 
     return () => {
       isMounted = false;
@@ -211,18 +209,17 @@ const Page = () => {
     setSelectedItem(null);
   };
 
-  const handleDeleteItem = async (itemId: string) => {
-    try {
-      await deleteStock(itemId);
-      setIsDeleteModalOpen(false);
-      setStockItems((prev) =>
-        prev.filter((item) => item.product_id !== itemId)
-      );
-    } catch (error) {
-      console.error('Error deleting stock:', error);
-      console.error('Error deleting stock:', error);
-    }
-  };
+  // const handleDeleteItem = async (itemId: string) => {
+  //   try {
+  //     await deleteStock(itemId);
+  //     setIsDeleteModalOpen(false);
+  //     setStockItems((prev) =>
+  //       prev.filter((item) => item.product_id !== itemId)
+  //     );
+  //   } catch (error) {
+  //     console.error("Error deleting stock:", error);
+  //   }
+  // };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -242,8 +239,7 @@ const Page = () => {
         setEditedItem((prev) => ({
           ...prev!,
           [field]:
-            field === 'quantity' || field === 'buying_price'
-            field === 'quantity' || field === 'buying_price'
+            field === "quantity" || field === "buying_price"
               ? Number(value)
               : value,
         }));
@@ -279,13 +275,10 @@ const Page = () => {
       const token = await getAccessToken();
       setIsEditingTransition(editedItem.id);
 
-      const response = await fetch('/api/stocks/edit', {
-        method: 'PUT',
-      const response = await fetch('/api/stocks/edit', {
-        method: 'PUT',
+      const response = await fetch("/api/stocks/edit", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -299,8 +292,7 @@ const Page = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update stock item');
-        throw new Error('Failed to update stock item');
+        throw new Error("Failed to update stock item");
       }
 
       setStockItems((prevItems) =>
@@ -311,10 +303,8 @@ const Page = () => {
 
       setEditedItem(null);
     } catch (error) {
-      console.error('Error saving changes:', error);
-      alert('Failed to save changes. Please try again.');
-      console.error('Error saving changes:', error);
-      alert('Failed to save changes. Please try again.');
+      console.error("Error saving changes:", error);
+      alert("Failed to save changes. Please try again.");
     } finally {
       setIsEditingTransition(null);
     }
@@ -325,7 +315,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if (organizationId === '160db8736a9d47989381e01a987e4413') {
+    if (organizationId === "160db8736a9d47989381e01a987e4413") {
       setIsPremium(true);
     } else {
       setIsPremium(false);
@@ -342,8 +332,7 @@ const Page = () => {
 
   if (isLoading) {
     return (
-      <div className='flex h-screen items-center justify-center'>
-      <div className='flex h-screen items-center justify-center'>
+      <div className="flex h-screen items-center justify-center">
         <LoadingAnimation />
       </div>
     );
@@ -358,15 +347,14 @@ const Page = () => {
           onCancel={() => setIsLogoutModalOpen(false)}
         />
 
-        <DeleteItem
+        {/* <DeleteItem
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           onCancel={() => setIsDeleteModalOpen(false)}
           onDelete={handleDeleteItem}
           selectedItem={
             selectedItem
-              ? { product_id: selectedItem.product_id ?? '' }
-              ? { product_id: selectedItem.product_id ?? '' }
+              ? { product_id: selectedItem.product_id ?? "" }
               : undefined
           }
         />
