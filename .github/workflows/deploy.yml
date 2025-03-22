@@ -19,6 +19,7 @@ jobs:
           echo "DEPLOY_START_TIME=$(date +%s)" >> $GITHUB_ENV
           echo "COMMIT_TIMESTAMP=$(git log -1 --format=%ct)" >> $GITHUB_ENV
 
+
       - name: Restore build artifacts
         uses: actions/cache@v3
         with:
@@ -31,15 +32,17 @@ jobs:
         id: save_commit
         run: echo "CURRENT_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      - name: Determine port and environment
-        id: determine_port_env
+      - name: Determine port, environment, and directory
+        id: determine_port_env_dir
         run: |
           if [ "${{ github.ref_name }}" == "staging" ]; then
             echo "PORT=7777" >> $GITHUB_ENV
             echo "ENV=staging" >> $GITHUB_ENV
+            echo "DEPLOY_DIR=/var/www/shopdesk-staging" >> $GITHUB_ENV
           else
             echo "PORT=3000" >> $GITHUB_ENV
             echo "ENV=prod" >> $GITHUB_ENV
+            echo "DEPLOY_DIR=/var/www/shopdesk-production" >> $GITHUB_ENV
           fi
 
       - name: Deploy to Staging or Production
@@ -48,9 +51,10 @@ jobs:
         env:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_IP: ${{ secrets.SSH_IP }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          PORT: ${{ env.PORT }}
-          ENV: ${{ env.ENV }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}  # Use the PEM key from GitHub secrets
+          PORT: ${{ env.PORT }}  # Use the determined port
+          ENV: ${{ env.ENV }}  # Use the determined environment
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}  # Use the determined deployment directory
         run: |
           echo "$SSH_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
@@ -61,8 +65,7 @@ jobs:
           # Execute the deployment commands in a way that captures failures
           set -e
           ssh -o StrictHostKeyChecking=no -i deploy_key.pem "$SSH_USERNAME@$SSH_IP" "
-            cd shopdesk-fe &&
-            git fetch origin &&
+            cd $DEPLOY_DIR &&
             git checkout ${{ github.ref_name }} &&
             git reset --hard origin/${{ github.ref_name }} &&
             pm2 delete shopdesk-${{ github.ref_name }} || true &&
@@ -71,7 +74,6 @@ jobs:
             bun run build &&
             pm2 start \"bun run start:$ENV\" --name \"shopdesk-${{ github.ref_name }}\" --watch
           "
-          set +e
 
       - name: Log deployment end time
         if: always()
@@ -97,20 +99,22 @@ jobs:
           mttr_seconds{workflow="cd", branch="${{ github.ref_name }}"} $(($(date +%s) - ${{ env.DEPLOY_START_TIME }}))
           EOF
 
+
       - name: Rollback on failure
         if: failure() && steps.deployment.outcome == 'failure' && env.DEPLOYMENT_STARTED == 'true'
         env:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_IP: ${{ secrets.SSH_IP }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          PORT: ${{ env.PORT }}
-          ENV: ${{ env.ENV }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}  # Use the PEM key from GitHub secrets
+          PORT: ${{ env.PORT }}  # Use the determined port
+          ENV: ${{ env.ENV }}  # Use the determined environment
+          DEPLOY_DIR: ${{ env.DEPLOY_DIR }}  # Use the determined deployment directory
         run: |
           echo "$SSH_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
           echo "Attempting rollback to commit ${{ env.CURRENT_COMMIT }}"
           ssh -o StrictHostKeyChecking=no -i deploy_key.pem "$SSH_USERNAME@$SSH_IP" "
-            cd shopdesk-fe &&
+            cd $DEPLOY_DIR &&
             git checkout ${{ github.ref_name }} &&
             git reset --hard ${{ env.CURRENT_COMMIT }} &&
             pm2 delete shopdesk-${{ github.ref_name }} || true &&
@@ -118,6 +122,7 @@ jobs:
             bun install &&
             pm2 start \"bun run start:$ENV\" --name \"shopdesk-${{ github.ref_name }}\" --watch
           "
+
 
       - name: Push rollback metrics to Prometheus
         if: failure() && steps.deployment.outcome == 'failure' && env.DEPLOYMENT_STARTED == 'true'
