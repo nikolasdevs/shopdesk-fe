@@ -2,14 +2,11 @@
 
 import { getAccessToken } from "@/app/api/token";
 import LoadingAnimation from "@/components/functional/loading";
-import Logo from "@/components/functional/logo";
-import PaginationFeature from "@/components/functional/paginationfeature";
-import Sidebar from "@/components/functional/sidebar";
-import ImageUploader from "@/components/modal/add-image";
-import AddItemModal from "@/components/modal/add-item";
+
 import DeleteItem from "@/components/modal/delete-item";
 import EditItemModal from "@/components/modal/edit-stock";
 import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
+<<<<<<< HEAD
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,20 +26,17 @@ import settings from "@/public/icons/_ui-settings-01.svg";
 import viewDeleted from "@/public/icons/_ui-trash-03.svg";
 import box from "@/public/icons/box.svg";
 //import { deleteStock, GetProduct, GetStock } from '@/services/stock';
+=======
+
+import { deleteStock, GetProduct, GetStock } from "@/services/stock";
+>>>>>>> upstream/main
 import { useStore } from "@/store/useStore";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { ChevronDown, Loader2, Plus, Search, X } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaSortDown } from "react-icons/fa";
 import useTableAreaHeight from "./hooks/useTableAreaHeight";
+<<<<<<< HEAD
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 declare module "@tanstack/react-table" {
@@ -51,6 +45,12 @@ declare module "@tanstack/react-table" {
     updateData?: (rowIndex: number, key: string, value: string) => void;
   }
 }
+=======
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import TableContent from "./components/TableContent";
+import Settings from "./components/Settings";
+>>>>>>> upstream/main
 
 export type StockItem = {
   id: string;
@@ -109,41 +109,28 @@ const Page = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [organizationInitial, setOrganizationInitial] = useState("");
 
-  //Active Tab
-  const [activeTab, setActiveTab] = useState("stock");
-
   const [isOpen, setIsOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState<StockItem | null>(null);
   const [user, setUser] = useState<any>(null);
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isMobileLogoutModalOpen, setIsMobileLogoutModalOpen] = useState(false);
+  const [isDesktopLogoutModalOpen, setIsDesktopLogoutModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
-  const [searchText, setSearchText] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const [isEditingTransition, setIsEditingTransition] = useState<string | null>(
     null
   );
   const [editedItem, setEditedItem] = useState<StockItem | null>(null);
   const [activeField, setActiveField] = useState<keyof StockItem | null>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const priceInputRef = useRef<HTMLInputElement>(null);
-  const quantityInputRef = useRef<HTMLInputElement>(null);
-  const filteredItems = stockItems.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      (item.sku && item.sku.toLowerCase().includes(searchText.toLowerCase()))
-  );
-  const [isLoading, setIsLoading] = useState(true);
-  const [showSales, setShowSales] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+
+<<<<<<< HEAD
   const [showProfit, setShowProfit] = useState(false);
 
   // Set initials for Avatar fallback on nav menu
@@ -173,6 +160,9 @@ const Page = () => {
     }
     setShowProfit((prev) => !prev);
   };
+=======
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+>>>>>>> upstream/main
 
   const router = useRouter();
 
@@ -313,16 +303,6 @@ const Page = () => {
     setCurrentPage(1);
   };
 
-  const handleInlineEdit = useCallback(
-    (item: StockItem, field: keyof StockItem = "name") => {
-      setIsEditingTransition(item.id);
-      setEditedItem({ ...item });
-      setActiveField(field);
-      setIsEditingTransition(null);
-    },
-    []
-  );
-
   const handleInputChange = useCallback(
     (field: keyof StockItem, value: string) => {
       if (editedItem) {
@@ -338,6 +318,22 @@ const Page = () => {
     },
     [editedItem]
   );
+
+  const handleInlineEdit = useCallback(
+    (item: StockItem, field: keyof StockItem = "name") => {
+      console.log("Inline edit started:", item.id, field);
+      setIsEditingTransition(item.id);
+      setEditedItem({ ...item });
+      setActiveField(field);
+      setIsEditingTransition(null);
+    },
+    []
+  );
+
+  const cancelEdit = useCallback(() => {
+    setEditedItem(null);
+    setActiveField(null);
+  }, []);
 
   const handleSaveInline = async () => {
     if (!editedItem) return;
@@ -382,6 +378,10 @@ const Page = () => {
     }
   };
 
+  const handleSettingsClick = () => {
+    setShowSettings(true);
+  };
+
   useEffect(() => {
     if (organizationId === "160db8736a9d47989381e01a987e4413") {
       setIsPremium(true);
@@ -390,6 +390,7 @@ const Page = () => {
     }
   }, []);
 
+<<<<<<< HEAD
   // if (organizationId !== "160db8736a9d47989381e01a987e4413" &&  stockItems.length >= 10){
   //   setIsPremium(false)
   // }
@@ -699,6 +700,11 @@ const Page = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+=======
+  const handleBackToStock = () => {
+    setShowSettings(false);
+  };
+>>>>>>> upstream/main
 
   if (isLoading) {
     return (
@@ -708,22 +714,30 @@ const Page = () => {
     );
   }
 
-  const handleRowClick = (item: StockItem) => {
-    setSelectedItem(item);
-    setIsSidebarOpen(false);
-  };
-
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-  };
-
   return (
     <main className="px-6 py-4 w-full max-w-7xl mx-auto flex flex-col main-h-svh ">
       <div ref={tableAreaRef} className="space-y-8 w-full h-full ">
+<<<<<<< HEAD
         <LogoutConfirmModal
           open={isLogoutModalOpen}
           onOpenChange={(open) => setIsLogoutModalOpen(open)}
         />
+=======
+      <LogoutConfirmModal
+         organizationName={organizationName}
+         open={isMobileLogoutModalOpen || isDesktopLogoutModalOpen}
+         onOpenChange={(open) => {
+           if (!open) {
+             setIsMobileLogoutModalOpen(false);
+             setIsDesktopLogoutModalOpen(false);
+           }
+         }}
+         onCancel={() => {
+           setIsMobileLogoutModalOpen(false);
+           setIsDesktopLogoutModalOpen(false);
+         }}
+       />
+>>>>>>> upstream/main
 
         {/* <DeleteItem
           open={isDeleteModalOpen}
@@ -735,6 +749,7 @@ const Page = () => {
               ? { product_id: selectedItem.product_id ?? "" }
               : undefined
           }
+<<<<<<< HEAD
         /> */}
         <div className="lg:border px-4 py-2 lg:shadow-md rounded-lg lg:flex items-center justify-between mx-auto">
           <div className="flex items-center gap-6">
@@ -1145,7 +1160,38 @@ const Page = () => {
             )}
           </div>
         </div>
+=======
+        />
+
+        <Header onSettingsClick={handleSettingsClick} />
+>>>>>>> upstream/main
       </div>
+
+      {showSettings ? (
+        <div>
+          <div className="mb-4">
+            <button
+              onClick={handleBackToStock}
+              className="flex items-center text-[#009A49] hover:underline"
+            >
+              ← Back to Stock
+            </button>
+          </div>
+          <Settings />
+        </div>
+      ) : (
+        <TableContent
+          stockItems={stockItems}
+          setStockItems={setStockItems}
+          handleInputChange={handleInputChange}
+          handleInlineEdit={handleInlineEdit}
+          handleSaveInline={handleSaveInline}
+          editedItem={editedItem}
+          isEditingTransition={isEditingTransition}
+          activeField={activeField}
+          cancelEdit={cancelEdit}
+        />
+      )}
 
       <EditItemModal
         isOpen={openEdit}
@@ -1154,11 +1200,7 @@ const Page = () => {
         onSave={handleSaveEdit}
       />
 
-      <div className="flex flex-col gap-2 mt-4">
-        <p className="text-center mt-4">
-          © {new Date().getFullYear()}, Powered by Timbu Business
-        </p>
-      </div>
+      <Footer />
     </main>
   );
 };
