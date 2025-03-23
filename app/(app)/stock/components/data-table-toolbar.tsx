@@ -22,7 +22,7 @@ export function DataTableToolbar<TData>({
   return (
     <div className='flex items-center justify-between'>
       <div className='flex flex-1 items-center space-x-2'>
-        <Input
+        {/* <Input
           placeholder='Filter tasks...'
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
@@ -53,7 +53,7 @@ export function DataTableToolbar<TData>({
             Reset
             <X />
           </Button>
-        )}
+        )} */}
       </div>
       <DataTableViewOptions table={table} />
     </div>

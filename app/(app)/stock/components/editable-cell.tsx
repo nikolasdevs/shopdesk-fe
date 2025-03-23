@@ -49,8 +49,8 @@ export function EditableCell({ value, currency, onChange }: EditableCellProps) {
       ref={inputRef}
       value={
         currency
-          ? `${currency ?? ''} ${internalValue.toLocaleString() ?? ''}`
-          : `${internalValue.toLocaleString() ?? ''}`
+          ? `${currency ?? ''} ${internalValue?.toLocaleString() ?? ''}`
+          : `${internalValue?.toLocaleString() ?? ''}`
       }
       onClick={() => setEditing(true)}
       onKeyDown={() => setEditing(true)}

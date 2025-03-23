@@ -9,7 +9,6 @@ import { EditableCell } from './editable-cell';
 import { Icons } from '@/components/ui/icons';
 import { Button } from '@/components/ui/button';
 
-
 export const columns: ColumnDef<Stock>[] = [
   {
     id: 'select',
@@ -80,7 +79,9 @@ export const columns: ColumnDef<Stock>[] = [
       <DataTableColumnHeader column={column} title='AVAILABLE' />
     ),
     cell: ({ row }) => {
-      const value = row.getValue<string>('quantity');
+      const value = row.original.quantity;
+
+      console.log(value, 'value');
 
       return (
         <EditableCell
