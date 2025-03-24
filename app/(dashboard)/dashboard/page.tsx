@@ -1143,7 +1143,10 @@ const Page = () => {
           © {new Date().getFullYear()}, Powered by Timbu Business
         </p>
       </div>
+
+      
     </main>
   );
 };
+
 export default Page;
