@@ -8,6 +8,7 @@ import authSliceReducer from './features/auth/auth.slice';
 import stocksSliceReducer from './features/stock/stock.slice';
 import { sidebarReducer } from './features/sidebar';
 import salesReducer from '@/redux/slicer';
+import notificationsReducer from './notificationlslice';
 
 const persistConfig = {
   key: 'root',
@@ -23,6 +24,7 @@ const appReducer = combineReducers({
   stocks: stocksSliceReducer,
   sidebar: sidebarReducer,
   sales: salesReducer,
+  notification: notificationsReducer,
   [api.reducerPath]: api.reducer,
 });
 
