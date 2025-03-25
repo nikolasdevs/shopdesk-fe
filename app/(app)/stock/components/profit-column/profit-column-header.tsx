@@ -45,12 +45,12 @@ export function ProfitColumnHeader<TData>({
 
   return (
     <div className="flex justify-center items-center flex-col">
-      <div className="flex gap-2.5 py-2">
+      <div className="flex gap-2.5 py-2 px-2">
         <Button
           variant="ghost"
           onClick={toggleExpand}
           disabled={isExpanded}
-          className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase text-lg text-[#090F1C] px-4 w-fit ${
+          className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase lg:text-lg text-[#090F1C] px-4 w-fit text-xs  ${
             !isExpanded ? "border border-[#DEE5ED] py-1.5 h-auto" : "!text-sm"
           }`}
         >
@@ -79,12 +79,12 @@ export function ProfitColumnHeader<TData>({
                 onClick={() => handleSort(key)}
                 className={cn(
                   "h-8 w-fit font-medium px-0 py-0 rounded-none",
-                  "flex items-center justify-center gap-0 ",
+                  "flex items-center justify-center gap-0 text-center ",
                   "hover:bg-transparent transition-colors",
                   activeSortKey === key && "bg-muted "
                 )}
               >
-                <span className="whitespace-nowrap uppercase text-[#090F1C]">
+                <span className="whitespace-nowrap uppercase px-1 text-[#090F1C] ml-2">
                   {label}
                 </span>
                 <div className="w-4 h-4 flex items-center justify-center">

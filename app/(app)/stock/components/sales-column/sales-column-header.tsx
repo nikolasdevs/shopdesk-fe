@@ -42,14 +42,14 @@ export function SalesColumnHeader<TData>({
 
   return (
     <div
-      className={`flex justify-center items-center flex-col w-full relative h-full`}
+      className={`flex justify-center items-center flex-col w-full relative h-full min-w-[250px]`}
     >
-      <div className="w-full relative flex justify-center items-center h-6/10">
+      <div className="w-full relative flex justify-center items-center h-6/10 px-2">
         <Button
           variant="ghost"
           onClick={toggleExpand}
           disabled={isExpanded}
-          className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase text-lg text-center text-[#090F1C] px-4 w-fit ${
+          className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all text-xs rounded-[6px] uppercase lg:text-lg text-center text-[#090F1C] lg:px-4 w-fit ${
             !isExpanded ? "border border-[#DEE5ED] py-1.5 h-auto" : "!text-sm "
           }`}
         >
@@ -78,7 +78,7 @@ export function SalesColumnHeader<TData>({
                 onClick={() => handleDaySort(day.toLowerCase())}
                 className={cn(
                   "h-8 w-full font-medium px-0 py-0 rounded-none",
-                  "flex items-center justify-center gap-0 ",
+                  "flex items-center justify-center gap-0 px-1",
                   "hover:bg-transparent transition-colors",
                   activeSortDay === day.toLowerCase() && "bg-muted"
                 )}
