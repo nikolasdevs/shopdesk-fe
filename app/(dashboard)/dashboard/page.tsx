@@ -170,7 +170,6 @@ const Page = () => {
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<StockItem | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
 
   const handleImageClick = (item: StockItem) => {
     setCurrentItem(item);
@@ -300,6 +299,7 @@ const Page = () => {
 
   const handleInputChange = useCallback(
     (field: keyof StockItem, value: string) => {
+      console.log("Input changed:", field, value);
       if (editedItem) {
         setEditedItem((prev) => ({
           ...prev!,
@@ -314,10 +314,28 @@ const Page = () => {
     [editedItem]
   );
 
+  const handleInlineEdit = useCallback(
+    (item: StockItem, field: keyof StockItem = "name") => {
+      console.log("Inline edit started:", item.id, field);
+      setIsEditingTransition(item.id);
+      setEditedItem({ ...item });
+      setActiveField(field);
+      setIsEditingTransition(null);
+    },
+    []
+  );
+
+  const cancelEdit = useCallback(() => {
+    setEditedItem(null);
+    setActiveField(null);
+  }, []);
+
   const handleSaveInline = async () => {
     if (!editedItem) return;
 
-    const organization_id = useStore.getState().organizationId;
+    console.log("Saving inline edit:", editedItem);
+
+    const organization_id = organizationId;
     try {
       const token = await getAccessToken();
       setIsEditingTransition(editedItem.id);
@@ -355,6 +373,10 @@ const Page = () => {
     } finally {
       setIsEditingTransition(null);
     }
+  };
+
+  const handleSettingsClick = () => {
+    setShowSettings(true);
   };
 
   useEffect(() => {
@@ -678,15 +700,6 @@ const Page = () => {
       </div>
     );
   }
-
-  const handleRowClick = (item: StockItem) => {
-    setSelectedItem(item);
-    setIsSidebarOpen(false);
-  };
-
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-  };
 
   return (
     <React.Fragment>
