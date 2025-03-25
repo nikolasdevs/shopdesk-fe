@@ -1,66 +1,23 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import {
-  ChevronDown,
-  Edit,
-  Loader2,
-  MoreVertical,
-  SaveAll,
-  Trash2,
-  Plus,
-  X,
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import EditItemModal from '@/components/modal/edit-stock';
-import AddItemModal from '@/components/modal/add-item';
-import DeleteItem from '@/components/modal/delete-item';
-import ImageUploader from '@/components/modal/add-image';
-import PaginationFeature from '@/components/functional/paginationfeature';
-import { useOrganization } from '@/app/api/useOrganization';
-import { useStore } from '@/store/useStore';
-import { FaSortDown } from 'react-icons/fa';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import LogoutConfirmModal from '@/components/modal/logoutConfirmationModal';
-import Image from 'next/image';
-import Logo from '@/components/functional/logo';
-import LoadingAnimation from '@/components/functional/loading';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/table';
-import useTableAreaHeight from './hooks/useTableAreaHeight';
-import { deleteStock, GetProduct, GetStock } from '@/services/stock';
-import { Search } from 'lucide-react';
-import box from '@/public/icons/box.svg';
-import {
-  ColumnDef,
-  getCoreRowModel,
-  useReactTable,
-  flexRender,
-} from '@tanstack/react-table';
-import { getAccessToken } from '@/app/api/token';
-import Sidebar from '@/components/functional/sidebar';
+import { getAccessToken } from "@/app/api/token";
+import LoadingAnimation from "@/components/functional/loading";
 
-import { Separator } from '@radix-ui/react-dropdown-menu';
+import DeleteItem from "@/components/modal/delete-item";
+import EditItemModal from "@/components/modal/edit-stock";
+import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
 
-import SalesTab from '@/components/functional/salestab';
+import { deleteStock, GetProduct, GetStock } from "@/services/stock";
+import { useStore } from "@/store/useStore";
 
-declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData, TValue> {
-    className?: string;
-    updateData?: (rowIndex: number, key: string, value: string) => void;
-  }
-}
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaSortDown } from "react-icons/fa";
+import useTableAreaHeight from "./hooks/useTableAreaHeight";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import TableContent from "./components/TableContent";
+import Settings from "./components/Settings";
 
 export type StockItem = {
   id: string;
@@ -127,8 +84,6 @@ const Page = () => {
 
   const [selectedItem, setSelectedItem] = useState<StockItem | null>(null);
   const [user, setUser] = useState<any>(null);
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -141,35 +96,11 @@ const Page = () => {
   );
   const [editedItem, setEditedItem] = useState<StockItem | null>(null);
   const [activeField, setActiveField] = useState<keyof StockItem | null>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const priceInputRef = useRef<HTMLInputElement>(null);
-  const quantityInputRef = useRef<HTMLInputElement>(null);
-  const filteredItems = stockItems.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      (item.sku && item.sku.toLowerCase().includes(searchText.toLowerCase()))
-  );
+
   const [isLoading, setIsLoading] = useState(true);
-  const [showSales, setShowSales] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
-  const [showProfit, setShowProfit] = useState(false);
-
-  const toggleSales = () => {
-    if (isSidebarOpen) {
-      alert('First close the sidebar to view Sales.');
-      return;
-    }
-    setShowSales((prev) => !prev);
-  };
-
-  const toggleProfit = () => {
-    if (isSidebarOpen) {
-      alert('First close the sidebar to view Profit.');
-      return;
-    }
-    setShowProfit((prev) => !prev);
-  };
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
   const router = useRouter();
 
@@ -192,7 +123,6 @@ const Page = () => {
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<StockItem | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
 
   const handleImageClick = (item: StockItem) => {
     setCurrentItem(item);
@@ -322,6 +252,7 @@ const Page = () => {
 
   const handleInputChange = useCallback(
     (field: keyof StockItem, value: string) => {
+      console.log("Input changed:", field, value);
       if (editedItem) {
         setEditedItem((prev) => ({
           ...prev!,
@@ -336,10 +267,28 @@ const Page = () => {
     [editedItem]
   );
 
+  const handleInlineEdit = useCallback(
+    (item: StockItem, field: keyof StockItem = "name") => {
+      console.log("Inline edit started:", item.id, field);
+      setIsEditingTransition(item.id);
+      setEditedItem({ ...item });
+      setActiveField(field);
+      setIsEditingTransition(null);
+    },
+    []
+  );
+
+  const cancelEdit = useCallback(() => {
+    setEditedItem(null);
+    setActiveField(null);
+  }, []);
+
   const handleSaveInline = async () => {
     if (!editedItem) return;
 
-    const organization_id = useStore.getState().organizationId;
+    console.log("Saving inline edit:", editedItem);
+
+    const organization_id = organizationId;
     try {
       const token = await getAccessToken();
       setIsEditingTransition(editedItem.id);
@@ -379,323 +328,21 @@ const Page = () => {
     }
   };
 
+  const handleSettingsClick = () => {
+    setShowSettings(true);
+  };
+
   useEffect(() => {
     if (organizationId === '160db8736a9d47989381e01a987e4413') {
       setIsPremium(true);
     } else {
       setIsPremium(false);
     }
-  }, []);
+  }, [])
 
-  // if (organizationId !== "160db8736a9d47989381e01a987e4413" &&  stockItems.length >= 10){
-  //   setIsPremium(false)
-  // }
-
-  useEffect(() => {
-    if (editedItem && activeField) {
-      switch (activeField) {
-        case 'name':
-          nameInputRef.current?.focus();
-          break;
-        case 'buying_price':
-          priceInputRef.current?.focus();
-          break;
-        case 'quantity':
-          quantityInputRef.current?.focus();
-          break;
-      }
-    }
-  }, [editedItem, activeField]);
-
-  const columns: ColumnDef<StockItem>[] = useMemo(
-    () => [
-      {
-        accessorKey: 'name',
-        header: () => (
-          <span className='!px-4 flex flex-start font-circular-medium  text-[18px] leading-[28px] tracking-normal text-center  w-full'>
-            ITEM NAME
-          </span>
-        ),
-        cell: ({ row }) => {
-          const isEditingThisRow = editedItem?.id === row.original.id;
-          const isTransitioning = isEditingTransition === row.original.id;
-
-          return (
-            <div
-              className='w-full h-full flex items-center overflow-hidden'
-              onClick={() =>
-                !isEditingThisRow && handleInlineEdit(row.original, 'name')
-              }
-            >
-              {isTransitioning ? (
-                <Loader2 className='w-4 h-4 animate-spin mx-auto' />
-              ) : isEditingThisRow ? (
-                <input
-                  ref={nameInputRef}
-                  value={editedItem?.name || ''}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSaveInline()}
-                  className='no-spinner w-full h-full min-w-0 border text-left box-border p-2 focus:outline-[#009A49]'
-                />
-              ) : (
-                <span className='block text-balance py-2 pl-4'>
-                  {row.original.name}
-                </span>
-              )}
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: 'sell_price',
-        header: () => (
-          <span className='!px-4 font-circular-medium text-[18px] leading-[28px] tracking-normal text-center'>
-            SELL PRICE
-          </span>
-        ),
-        cell: ({ row }) => {
-          const isEditingThisRow = editedItem?.id === row.original.id;
-          const isTransitioning = isEditingTransition === row.original.id;
-
-          return (
-            <div
-              className='flex w-full h-full items-center justify-center'
-              onClick={() =>
-                !isEditingThisRow &&
-                handleInlineEdit(row.original, 'buying_price')
-              }
-            >
-              {isTransitioning ? (
-                <Loader2 className='w-4 h-4 animate-spin mx-auto' />
-              ) : isEditingThisRow ? (
-                <input
-                  ref={priceInputRef}
-                  type='number'
-                  value={editedItem?.buying_price ?? ''}
-                  onChange={(e) =>
-                    handleInputChange('buying_price', e.target.value)
-                  }
-                  onKeyDown={(e) => e.key === 'Enter' && handleSaveInline()}
-                  className='no-spinner w-full h-full border text-center focus:outline-[#009A49]'
-                />
-              ) : (
-                <span className='block w-full overflow-x-clip'>{`${
-                  row.original.currency_code
-                } ${row.original.buying_price?.toLocaleString()}`}</span>
-              )}
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: 'available',
-        header: () => (
-          <span className='!px-4 font-circular-medium text-[18px] leading-[28px] tracking-normal text-center'>
-            AVAILABLE
-          </span>
-        ),
-        cell: ({ row }) => {
-          const isEditingThisRow = editedItem?.id === row.original.id;
-          const isTransitioning = isEditingTransition === row.original.id;
-
-          return (
-            <div
-              className='flex h-full w-full items-center justify-center'
-              onClick={() =>
-                !isEditingThisRow && handleInlineEdit(row.original, 'quantity')
-              }
-            >
-              {isTransitioning ? (
-                <Loader2 className='w-4 h-4 animate-spin mx-auto' />
-              ) : isEditingThisRow ? (
-                <input
-                  ref={quantityInputRef}
-                  type='number'
-                  value={editedItem?.quantity ?? ''}
-                  onChange={(e) =>
-                    handleInputChange('quantity', e.target.value)
-                  }
-                  onKeyDown={(e) => e.key === 'Enter' && handleSaveInline()}
-                  className='no-spinner w-full h-full border px-2 py-1 text-center focus:outline-[#009A49]'
-                />
-              ) : (
-                row.original.quantity
-              )}
-            </div>
-          );
-        },
-        meta: { className: '' },
-      },
-      {
-        accessorKey: 'sales',
-        header: () =>
-          showSales ? (
-            <div className='bg-[#CCEBDB] relative w-full h-full'>
-              <div className='flex justify-between items-center max-w-[356px] py-4'>
-                <span className='text-[#595959] font-circular-medium text-[14px] text-center w-full'>
-                  SALES
-                </span>
-                <button
-                  onClick={toggleSales}
-                  className='rounded-[6px] border border-green-200 hover:bg-gray-200'
-                >
-                  <X className='rounded-[6px] py-[4px] px-[8px] bg-white w-full h-full' />
-                </button>
-              </div>
-
-              <div className='grid grid-cols-5 text-center border-t border-[#B2E1C8]'>
-                {['MON', 'TUE', 'WED', 'THU', 'FRI'].map((day, index) => (
-                  <div
-                    key={day}
-                    className={`flex items-center justify-center text-[12px] gap-1 text-gray-700 font-circular-medium py-[9px] ${
-                      index !== 4 ? 'border-r border-[#B2E1C8]' : ''
-                    }`}
-                  >
-                    {day}
-                    <FaSortDown className='w-[13px] h-[13px] text-[#83838B] mb-1' />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className='flex justify-center items-center w-full p-4'>
-              <button
-                onClick={toggleSales}
-                className='bg-[#F6F8FA] border border-[#DEE5ED] rounded-[6px] font-circular-medium text-[#090F1C] py-2 px-4'
-              >
-                SHOW SALES
-              </button>
-            </div>
-          ),
-        cell: ({ row }) =>
-          showSales ? (
-            <div className='grid grid-cols-5 h-full w-full px-0'>
-              {['mon', 'tue', 'wed', 'thu', 'fri'].map((day) => (
-                <input
-                  key={day}
-                  type='number'
-                  className='no-spinner w-full h-full border-r px-2 py-1 text-center focus:outline-[#009A49]'
-                />
-              ))}
-            </div>
-          ) : null,
-      },
-      {
-        accessorKey: 'profitGroup',
-        header: () =>
-          showProfit ? (
-            <div className='relative w-full h-full border border-[#CCEAFF]'>
-              <div className='bg-[#E5F4FF] flex justify-between items-center max-w-[356px] p-3'>
-                <span className='text-[#595959] font-circular-medium text-[14px] text-center w-full'>
-                  PROFIT
-                </span>
-                <button
-                  onClick={toggleProfit}
-                  className='rounded-[6px] border border-green-200 hover:bg-gray-200'
-                >
-                  <X className='rounded-[6px] py-[4px] px-[8px] bg-white w-full h-full' />
-                </button>
-              </div>
-              <div className='bg-[#E5F4FF] grid grid-cols-2 text-center border-t border-[#B2E1C8]'>
-                <div className='flex items-center justify-center gap-2 text-gray-700 font-circular-medium py-[9px] border-r border-[#B2E1C8]'>
-                  <span>COST PRICE</span>
-                  <FaSortDown className='w-[12px] h-[12px] text-[#83838B] mb-1' />
-                </div>
-                <div className='flex items-center justify-center gap-2 text-gray-700 font-circular-medium py-[9px]'>
-                  <span>PROFIT</span>
-                  <FaSortDown className='w-[12px] h-[12px] text-[#83838B] mb-1' />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className='flex justify-center items-center w-full p-4'>
-              <button
-                onClick={toggleProfit}
-                className='bg-[#F6F8FA] border border-[#DEE5ED] rounded-[6px] font-circular-medium text-[#090F1C] py-2 px-4'
-              >
-                SHOW PROFIT
-              </button>
-            </div>
-          ),
-        cell: ({ row, column }) =>
-          showProfit ? (
-            <div
-              className={`flex items-center justify-between w-full h-full ${
-                showProfit ? '' : 'hidden sm:table-cell'
-              }`}
-            >
-              <input
-                type='number'
-                onBlur={(e) =>
-                  column.columnDef.meta?.updateData?.(
-                    row.index,
-                    'costPrice',
-                    e.target.value
-                  )
-                }
-                className='w-1/2 px-2 py-1 border-r border-gray-300 h-full text-center'
-                placeholder='CP'
-              />
-              <input
-                type='number'
-                onBlur={(e) =>
-                  column.columnDef.meta?.updateData?.(
-                    row.index,
-                    'profit',
-                    e.target.value
-                  )
-                }
-                className='w-1/2 px-2 py-1 border-gray-300 h-full text-center'
-                placeholder='Profit'
-              />
-            </div>
-          ) : null,
-        meta: {
-          updateData: (rowIndex, key, value) => {
-            console.log(
-              `Updating row ${rowIndex}, key ${key} with value ${value}`
-            );
-          },
-        },
-      },
-
-      {
-        id: 'actions',
-        header: () => (
-          <div className='flex justify-center items-center'>
-            <Plus className='w-[15px] h-[15px] text-[#2A2A2A] self-center' />
-          </div>
-        ),
-        cell: () => null, // Empty cell
-        size: 8, // Set a small width for the column
-      },
-    ],
-    [
-      editedItem,
-      isEditingTransition,
-      handleInlineEdit,
-      handleSaveInline,
-      showSales,
-      showProfit,
-      toggleSales,
-      toggleProfit,
-    ]
-  );
-  const paginatedData = isSearching
-    ? filteredItems.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-      )
-    : stockItems.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-      );
-
-  const table = useReactTable({
-    data: paginatedData,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+  const handleBackToStock = () => {
+    setShowSettings(false);
+  };
 
   if (isLoading) {
     return (
@@ -705,23 +352,23 @@ const Page = () => {
     );
   }
 
-  const handleRowClick = (item: StockItem) => {
-    setSelectedItem(item);
-    setIsSidebarOpen(false);
-  };
-
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-  };
-
   return (
-    <main className='px-6 py-4 w-full max-w-7xl mx-auto flex flex-col main-h-svh '>
-      <div ref={tableAreaRef} className='space-y-8 w-full h-full '>
-        <LogoutConfirmModal
-          open={isLogoutModalOpen}
-          onOpenChange={setIsLogoutModalOpen}
-          onCancel={() => setIsLogoutModalOpen(false)}
-        />
+    <main className="px-6 py-4 w-full max-w-7xl mx-auto flex flex-col main-h-svh ">
+      <div ref={tableAreaRef} className="space-y-8 w-full h-full ">
+      <LogoutConfirmModal
+         organizationName={organizationName}
+         open={isMobileLogoutModalOpen || isDesktopLogoutModalOpen}
+         onOpenChange={(open) => {
+           if (!open) {
+             setIsMobileLogoutModalOpen(false);
+             setIsDesktopLogoutModalOpen(false);
+           }
+         }}
+         onCancel={() => {
+           setIsMobileLogoutModalOpen(false);
+           setIsDesktopLogoutModalOpen(false);
+         }}
+       />
 
         <DeleteItem
           open={isDeleteModalOpen}
@@ -1128,8 +775,21 @@ const Page = () => {
               />
             )}
           </div>
+          <Settings />
         </div>
-      </div>
+      ) : (
+        <TableContent
+          stockItems={stockItems}
+          setStockItems={setStockItems}
+          handleInputChange={handleInputChange}
+          handleInlineEdit={handleInlineEdit}
+          handleSaveInline={handleSaveInline}
+          editedItem={editedItem}
+          isEditingTransition={isEditingTransition}
+          activeField={activeField}
+          cancelEdit={cancelEdit}
+        />
+      )}
 
       <EditItemModal
         isOpen={openEdit}
@@ -1143,8 +803,6 @@ const Page = () => {
           © {new Date().getFullYear()}, Powered by Timbu Business
         </p>
       </div>
-
-      
     </main>
   );
 };
