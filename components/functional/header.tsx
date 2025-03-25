@@ -42,7 +42,7 @@ const Header = () => {
       <div className="py-4 flex items-center justify-between max-w-screen-xl">
         <Logo />
 
-        <nav className="hidden add-this-back-flex gap-6 text-[16px] max-[850px]:hidden">
+        <nav className="flex gap-6 text-[16px] max-[850px]:hidden">
           <Link href="/features" className="hover:text-green-500 transition">
             Features
           </Link>
