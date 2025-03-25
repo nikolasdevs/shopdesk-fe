@@ -42,7 +42,9 @@ export function SalesColumnHeader<TData>({
 
   return (
     <div
-      className={`flex justify-center items-center flex-col w-full relative h-full min-w-[250px]`}
+      className={`flex justify-center items-center flex-col w-full relative h-full overflow-hidden ${
+        isExpanded ? "min-w-[250px]" : ""
+      }`}
     >
       <div className="w-full relative flex justify-center items-center h-6/10 px-2">
         <Button
@@ -66,7 +68,7 @@ export function SalesColumnHeader<TData>({
       </div>
 
       {isExpanded && (
-        <div className="h-39/100 w-full grid grid-cols-5 border-t place-items-center items-center justify-center text-xs">
+        <div className="h-38/100 w-full grid grid-cols-5 border-t place-items-center items-center justify-center text-xs">
           {days.map((day) => (
             <div
               key={day}
