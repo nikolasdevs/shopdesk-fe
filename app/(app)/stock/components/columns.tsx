@@ -166,11 +166,12 @@ export const columns: ColumnDef<Stock>[] = [
       const isExpanded =
         (table.options.meta as { isProfitExpanded?: boolean })
           ?.isProfitExpanded || false;
-
+      const calculatedProfit =
+        Number(row.original.buying_price) - Number(row.original.cost_price);
       if (!isExpanded) {
         return (
           <div className="flex items-center justify-center">
-            {String(row.getValue("profitGroup") || 0)}
+            {calculatedProfit.toFixed(2) || 0}
           </div>
         );
       }
@@ -181,7 +182,7 @@ export const columns: ColumnDef<Stock>[] = [
             {String(row.original.cost_price || 0)}
           </div>
           <div className="border-none p-5  rounded-none text-sm w-full h-full focus-visible:outline-none focus-visible:border-2 focus-visible:ring-[#B2E1C8] focus-visible:z-10 relative">
-            {String(row.original.profit || 0)}
+            {calculatedProfit.toFixed(2) || 0}
           </div>
         </div>
       );
