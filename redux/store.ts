@@ -7,6 +7,7 @@ import storage from 'redux-persist/lib/storage';
 import authSliceReducer from './features/auth/auth.slice';
 import stocksSliceReducer from './features/stock/stock.slice';
 import { sidebarReducer } from './features/sidebar';
+import salesReducer from '@/redux/slicer';
 
 const persistConfig = {
   key: 'root',
@@ -21,12 +22,12 @@ const appReducer = combineReducers({
   auth: authSliceReducer,
   stocks: stocksSliceReducer,
   sidebar: sidebarReducer,
+  sales: salesReducer,
   [api.reducerPath]: api.reducer,
 });
 
 export type RootState = ReturnType<typeof appReducer>;
 
-// Define the RootReducer
 const rootReducer = (
   state: RootState | undefined,
   action: RootAction
