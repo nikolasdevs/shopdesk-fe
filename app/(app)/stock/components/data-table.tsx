@@ -82,22 +82,22 @@ export function DataTable<TData, TValue>({
   return (
     <div className="flex space-x-4 w-full h-full">
       {/* Main table container */}
-      <div className="flex-1 flex flex-col border border-gray-200 rounded-lg overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-[900px] border border-gray-200 rounded-lg overflow-x-auto">
         <div className="p-4 border-b">
           <DataTableToolbar table={table} />
         </div>
 
         {/* Table wrapper with scroll */}
-        <div className="flex-1 overflow-auto px-2 pb-2">
-          <Table className="w-full border-collapse">
-            <TableHeader className="bg-gray-50">
+        <div className="flex-1 overflow-x-auto px-2 pb-2">
+          <Table className="min-w-full">
+            <TableHeader className="bg-gray-50 min-w-full">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-r border-gray-200 last:border-r-0 last:border-white last:bg-white"
+                      className="px-4 py-3 text-left min-w-full text-sm font-medium text-gray-700 border-b border-r border-gray-200 last:border-r-0"
                     >
                       {header.isPlaceholder
                         ? null
@@ -124,7 +124,7 @@ export function DataTable<TData, TValue>({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center text-red-500"
+                    className="h-24 text-center text-red-500 oveflow-x-auto"
                   >
                     {error}
                   </TableCell>
@@ -135,7 +135,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => handleRowClick(row.original)}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="hover:bg-gray-50 cursor-pointer oveflow-x-auto"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell

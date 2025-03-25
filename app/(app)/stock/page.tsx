@@ -47,7 +47,7 @@ export default function StockPage() {
   }, [organizationId]);
 
   return (
-    <div className="container">
+    <div className="container mx-auto">
       <DataTable
         data={stocks ?? []}
         columns={columns}
