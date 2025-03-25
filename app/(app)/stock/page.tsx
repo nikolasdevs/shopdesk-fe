@@ -48,13 +48,12 @@ export default function StockPage() {
 
   return (
     <div className="container">
-      {loading ? (
-        <p>Loading stocks...</p>
-      ) : error ? (
-        <p style={{ color: "red" }}>{error}</p>
-      ) : (
-        <DataTable data={stocks ?? []} columns={columns} />
-      )}
+      <DataTable
+        data={stocks ?? []}
+        columns={columns}
+        loading={loading}
+        error={error}
+      />
     </div>
   );
 }
