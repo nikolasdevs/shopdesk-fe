@@ -3,18 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { Table } from "@tanstack/react-table";
-import { XIcon } from "lucide-react";
 import { useState } from "react";
 
-interface SalesColumnHeaderProps<TData> {
+interface ProfitColumnHeaderProps<TData> {
   table: Table<TData>;
 }
 
-export function SalesColumnHeader<TData>({
+export function ProfitColumnHeader<TData>({
   table,
-}: SalesColumnHeaderProps<TData>) {
+}: ProfitColumnHeaderProps<TData>) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeSortDay, setActiveSortDay] = useState<string | null>(null);
+  const [activeSortKey, setActiveSortKey] = useState<string | null>(null);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -22,68 +21,74 @@ export function SalesColumnHeader<TData>({
       ...prev,
       meta: {
         ...prev.meta,
-        isSalesExpanded: !isExpanded,
+        isProfitExpanded: !isExpanded,
       },
     }));
     table.reset();
   };
 
-  const handleDaySort = (day: string) => {
-    setActiveSortDay(day);
+  const handleSort = (key: string) => {
+    setActiveSortKey(key);
     table.setSorting([
       {
-        id: "sales",
+        id: "profit",
         desc:
-          activeSortDay === day ? !table.getState().sorting[0]?.desc : false,
+          activeSortKey === key ? !table.getState().sorting[0]?.desc : false,
       },
     ]);
   };
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+
+  const profitColumns = [
+    { key: "cost_price", label: "Cost Price" },
+    { key: "profit", label: "Profit" },
+  ];
 
   return (
-    <div className={`flex justify-center items-center flex-col w-full`}>
-      <div className="w-full relative flex justify-center items-center">
+    <div className="flex justify-center items-center flex-col">
+      <div className="flex gap-2.5 py-2">
         <Button
           variant="ghost"
           onClick={toggleExpand}
           disabled={isExpanded}
-          className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase text-lg text-center text-[#090F1C] px-4 w-fit ${
+          className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase text-lg text-[#090F1C] px-4 w-fit ${
             !isExpanded ? "border border-[#DEE5ED] py-1.5 h-auto" : "!text-sm"
           }`}
         >
-          {isExpanded ? "SALES" : "SHOW SALES"}
+          {isExpanded ? "PROFIT" : "SHOW PROFIT"}
         </Button>
         {isExpanded && (
           <Button
+            variant="ghost"
             onClick={toggleExpand}
-            className="bg-[#F6F8FA] py-2 px-1 text-black hover:bg-[#F6F8FA]/80 duration-150 transition-all absolute right-0 w-fit h-fit text-2xl"
+            className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase text-[#090F1C] w-fit border border-[#DEE5ED] text-xs  h-auto py-1 px-2`}
           >
-            <XIcon />
+            HIDE PROFIT
           </Button>
         )}
       </div>
 
       {isExpanded && (
-        <div className="w-full grid grid-cols-5 border-t place-items-center items-center justify-center text-xs">
-          {days.map((day) => (
+        <div className="grid grid-cols-2 border-t w-full place-items-center items-center justify-center text-xs">
+          {profitColumns.map(({ key, label }) => (
             <div
-              key={day}
+              key={key}
               className="w-full relative flex items-center justify-center"
             >
               <Button
-                key={day}
                 variant="ghost"
-                onClick={() => handleDaySort(day.toLowerCase())}
+                onClick={() => handleSort(key)}
                 className={cn(
-                  "h-8 w-full font-medium px-0 py-0 rounded-none",
+                  "h-8 w-fit font-medium px-0 py-0 rounded-none",
                   "flex items-center justify-center gap-0 border-r border-solid border-[#E9EEF3]",
                   "hover:bg-transparent transition-colors",
-                  activeSortDay === day.toLowerCase() && "bg-muted"
+                  activeSortKey === key && "bg-muted "
                 )}
               >
-                <span className="whitespace-nowrap uppercase">{day}</span>
+                <span className="whitespace-nowrap uppercase text-[#090F1C]">
+                  {label}
+                </span>
                 <div className="w-4 h-4 flex items-center justify-center">
-                  {activeSortDay === day.toLowerCase() && (
+                  {activeSortKey === key && (
                     <Icons.ArrowSort className="h-2 w-2" />
                   )}
                 </div>

@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -15,6 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import * as React from 'react';
 
 import {
   Table,
@@ -25,9 +25,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import Sidebar from '@/components/functional/sidebar';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
-import Sidebar from '@/components/functional/sidebar';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -75,13 +75,13 @@ export function DataTable<TData, TValue>({
   return (
     <div className='flex space-x-4 w-full h-full'>
       {/* Main table container */}
-      <div className='flex-1 flex flex-col space-y-4 border border-gray-200 rounded-lg overflow-hidden'>
+      <div className='flex-1 flex flex-col border border-gray-200 rounded-lg overflow-hidden'>
         <div className='p-4 border-b'>
           <DataTableToolbar table={table} />
         </div>
         
         {/* Table wrapper with scroll */}
-        <div className='flex-1 overflow-auto p-2'>
+        <div className='flex-1 overflow-auto px-2 pb-2'>
           <Table className='w-full border-collapse'>
             <TableHeader className='bg-gray-50'>
               {table.getHeaderGroups().map((headerGroup) => (
