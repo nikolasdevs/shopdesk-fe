@@ -1,7 +1,9 @@
 "use client";
 
+import { fetchWeekdaySalesCount } from "@/actions/sales";
 import { Icons } from "@/components/ui/icons";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import type { Stock } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
@@ -103,21 +105,35 @@ export const columns: ColumnDef<Stock>[] = [
         (table.options.meta as { isSalesExpanded?: boolean })
           ?.isSalesExpanded || false;
 
+      const [salesData, setSalesData] = useState<Record<string, number> | null>(
+        null
+      );
+      const [loading, setLoading] = useState(false);
+
+      useEffect(() => {
+        if (isExpanded) {
+          setLoading(true);
+          fetchWeekdaySalesCount(row.original.organization_id, row.original.id)
+            .then((data) => setSalesData(data))
+            .catch(() => setSalesData(null))
+            .finally(() => setLoading(false));
+        }
+      }, [isExpanded, row.original.organization_id, row.original.id]);
+
       if (!isExpanded) {
-        // Sum up all individual sales per day
-        const totalSales = ["mon", "tue", "wed", "thu", "fri"].reduce(
-          (acc, day) =>
-            acc +
-            (Number(
-              row.original[`sales_${day}` as keyof typeof row.original]
-            ) || 0),
-          0
-        );
+        const totalSales = [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+        ].reduce((acc, day) => acc + (row.original[`sales_${day}`] || 0), 0);
 
         return (
           <div className="flex items-center justify-center">{totalSales}</div>
         );
       }
+
       if (!isExpanded) {
         return (
           <div className="flex items-center justify-center">
@@ -127,17 +143,17 @@ export const columns: ColumnDef<Stock>[] = [
       }
 
       return (
-        <div className="grid grid-cols-5 gap-2">
-          {["mon", "tue", "wed", "thu", "fri"].map((day) => (
-            <div
-              key={day}
-              className="border-none p-5  rounded-none text-sm w-full h-full focus-visible:outline-none focus-visible:border-2 focus-visible:ring-[#B2E1C8] focus-visible:z-10 relative"
-            >
-              {String(
-                row.original[`sales_${day}` as keyof typeof row.original] || 0
-              )}
-            </div>
-          ))}
+        <div className="grid grid-cols-7 gap-2">
+          {["monday", "tuesday", "wednesday", "thursday", "friday"].map(
+            (day) => (
+              <div
+                key={day}
+                className="border-none p-5 rounded-none text-sm w-full h-full"
+              >
+                {loading ? "Loading..." : salesData ? salesData[day] : "N/A"}
+              </div>
+            )
+          )}
         </div>
       );
     },

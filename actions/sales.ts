@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 export async function fetchWeekdaySalesCount(
   organization_id: string,
   product_id: string,
-  date_range_end: string,
+  date_range_end?: string,
   date_range_start?: string,
   sale_status?: string
 ) {
@@ -18,13 +18,23 @@ export async function fetchWeekdaySalesCount(
     }
 
     const url = new URL("https://api.timbu.cloud/sales/weekday-count");
-    url.searchParams.append("organization_id", organization_id);
-    url.searchParams.append("product_id", product_id);
-    url.searchParams.append("date_range_end", date_range_end);
+    const params = {
+      organization_id,
+      product_id,
+      date_range_start,
+      date_range_end,
+      sale_status,
+    };
 
-    if (date_range_start)
-      url.searchParams.append("date_range_start", date_range_start);
-    if (sale_status) url.searchParams.append("sale_status", sale_status);
+    // Append only provided parameters
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) url.searchParams.append(key, value);
+    });
+
+    // Ensure at least one parameter is provided
+    if (!url.searchParams.toString()) {
+      return { error: "At least one query parameter is required." };
+    }
 
     const res = await fetch(url.toString(), {
       method: "GET",

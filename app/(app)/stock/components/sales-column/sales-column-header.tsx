@@ -41,14 +41,16 @@ export function SalesColumnHeader<TData>({
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
   return (
-    <div className={`flex justify-center items-center flex-col w-full`}>
-      <div className="w-full relative flex justify-center items-center">
+    <div
+      className={`flex justify-center items-center flex-col w-full relative h-full`}
+    >
+      <div className="w-full relative flex justify-center items-center h-6/10">
         <Button
           variant="ghost"
           onClick={toggleExpand}
           disabled={isExpanded}
           className={`bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] uppercase text-lg text-center text-[#090F1C] px-4 w-fit ${
-            !isExpanded ? "border border-[#DEE5ED] py-1.5 h-auto" : "!text-sm"
+            !isExpanded ? "border border-[#DEE5ED] py-1.5 h-auto" : "!text-sm "
           }`}
         >
           {isExpanded ? "SALES" : "SHOW SALES"}
@@ -64,11 +66,11 @@ export function SalesColumnHeader<TData>({
       </div>
 
       {isExpanded && (
-        <div className="w-full grid grid-cols-5 border-t place-items-center items-center justify-center text-xs">
+        <div className="h-39/100 w-full grid grid-cols-5 border-t place-items-center items-center justify-center text-xs">
           {days.map((day) => (
             <div
               key={day}
-              className="w-full relative flex items-center justify-center"
+              className="w-full relative flex items-center justify-center h-full border-r border-solid border-[#E9EEF3]"
             >
               <Button
                 key={day}
@@ -76,7 +78,7 @@ export function SalesColumnHeader<TData>({
                 onClick={() => handleDaySort(day.toLowerCase())}
                 className={cn(
                   "h-8 w-full font-medium px-0 py-0 rounded-none",
-                  "flex items-center justify-center gap-0 border-r border-solid border-[#E9EEF3]",
+                  "flex items-center justify-center gap-0 ",
                   "hover:bg-transparent transition-colors",
                   activeSortDay === day.toLowerCase() && "bg-muted"
                 )}

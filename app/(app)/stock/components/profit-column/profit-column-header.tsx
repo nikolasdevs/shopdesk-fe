@@ -72,14 +72,14 @@ export function ProfitColumnHeader<TData>({
           {profitColumns.map(({ key, label }) => (
             <div
               key={key}
-              className="w-full relative flex items-center justify-center"
+              className="w-full relative flex items-center justify-center border-r border-solid border-[#E9EEF3]"
             >
               <Button
                 variant="ghost"
                 onClick={() => handleSort(key)}
                 className={cn(
                   "h-8 w-fit font-medium px-0 py-0 rounded-none",
-                  "flex items-center justify-center gap-0 border-r border-solid border-[#E9EEF3]",
+                  "flex items-center justify-center gap-0 ",
                   "hover:bg-transparent transition-colors",
                   activeSortKey === key && "bg-muted "
                 )}
