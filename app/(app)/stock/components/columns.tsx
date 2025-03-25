@@ -2,6 +2,7 @@
 
 import { fetchWeekdaySalesCount } from "@/actions/sales";
 import { Icons } from "@/components/ui/icons";
+import { useStore } from "@/store/useStore";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import type { Stock } from "../data/schema";
@@ -109,16 +110,16 @@ export const columns: ColumnDef<Stock>[] = [
         null
       );
       const [loading, setLoading] = useState(false);
-
+      const { organizationId } = useStore();
       useEffect(() => {
         if (isExpanded) {
           setLoading(true);
-          fetchWeekdaySalesCount(row.original.organization_id, row.original.id)
+          fetchWeekdaySalesCount(organizationId, row.original.id)
             .then((data) => setSalesData(data))
             .catch(() => setSalesData(null))
             .finally(() => setLoading(false));
         }
-      }, [isExpanded, row.original.organization_id, row.original.id]);
+      }, [isExpanded, organizationId, row.original.id]);
 
       if (!isExpanded) {
         const totalSales = [
