@@ -1,4 +1,3 @@
-// components/Sidebar.tsx
 import React from 'react';
 import { X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -39,7 +38,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ selectedItem, onClose }) => {
   const dispatch = useAppDispatch();
   const {
-    isOpen,
     isEditModalOpen,
     isEditNameOpen,
     isEditQuantityOpen,
@@ -67,151 +65,87 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedItem, onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-x-[-15] md:inset-x-0 inset-0 md:relative w-full md:max-w-[356px] bg-white transition-transform duration-300 ease-in-out transform translate-x-0 flex flex-col flex-grow items-center rounded-xl md:border md:border-[#DEE5ED] md:m-0 overflow-auto">
-        {/* Header */}
-        <div className="hidden md:flex py-5.5 px-4 items-center justify-between border-b border-b-[#DEE5ED] w-full">
-          <p className="font-circular-medium text-2xl">{selectedItem.name}</p>
-          <button onClick={onClose} className="p-[9px] bg-neutral-200 rounded-md" aria-label="Close sidebar">
+      {/* Mobile overlay */}
+      <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
+      
+      {/* Main sidebar container */}
+      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[100vw] bg-white shadow-lg lg:relative lg:w-[356px] lg:border lg:border-[#DEE5ED] flex flex-col overflow-y-auto">
+        
+        {/* Desktop header */}
+        <div className="hidden lg:flex p-4 items-center justify-between border-b border-[#DEE5ED]">
+          <h2 className="text-xl font-semibold">{selectedItem.name}</h2>
+          <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-100">
             <X size={16} />
           </button>
         </div>
 
-        {/* Mobile Header */}
-        <div className="flex justify-center md:hidden my-4">
+        {/* Mobile header */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-[#DEE5ED] sticky top-0 bg-white z-10">
           <Logo />
-        </div>
-
-        <div className="flex items-center justify-between border-b border-b-[#DEE5ED] w-full md:hidden p-3">
-          <p className="font-circular-medium text-xl">Edit stock</p>
-          <button onClick={onClose} className="p-[7px] bg-neutral-100 rounded-lg">
-            <X size={13} className="text-neutral-600" />
+          <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-100">
+            <X size={16} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex flex-col md:py-5 md:px-4 items-start gap-5 w-full p-3">
-          {/* Cost Price */}
-          <div className="flex p-3 items-center justify-between gap-5 rounded-md w-full border-b border-b-[#E9EEF3] md:border-none md:bg-[#F8FAFB]">
-            <div className="flex flex-col gap-1 w-2/3">
-              <p className="text-[#717171] text-[16px] md:text-[18px] font-circular-normal leading-7">
-                Cost Price
-              </p>
-              <p className="text-[#2A2A2A] text-[18px] md:text-[20px] leading-7.5 font-circular-normal">
-                {selectedItem.costPrice || "265,000"}
-              </p>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto p-4">
+            {/* Product Name */}
+            <div className="flex justify-between items-center p-3 mb-3 rounded-md bg-[#F8FAFB]">
+              <div>
+                <p className="text-[#717171] text-sm">Product name</p>
+                <p className="text-[#2A2A2A] font-medium">
+                  {selectedItem?.name || selectedItem?.productName || "No name"}
+                </p>
+              </div>
+              <button 
+                onClick={() => dispatch(openEditName())}
+                className="text-sm font-medium px-4 py-2 border border-[#A0A0A0] rounded-xl lg:border-none lg:text-[#009A49]"
+              >
+                Edit
+              </button>
             </div>
-            <button
-              className="text-[#1B1B1B] md:text-[#009A49] font-circular-normal text-sm leading-6 cursor-pointer md:w-1/3 text-right border border-[#A0A0A0] rounded-xl py-3 px-6 md:py-0 md:px-0 md:border-none"
-              onClick={() => dispatch(openEditPrice())}
-            >
-              Edit
-            </button>
-          </div>
 
-          {/* Sell Price */}
-          <div className="flex p-3 items-center justify-between gap-5 rounded-md w-full border-b border-b-[#E9EEF3] md:border-none md:bg-[#F8FAFB]">
-            <div className="flex flex-col gap-1 w-2/3">
-              <p className="text-[#717171] text-[16px] md:text-[18px] font-circular-normal leading-7">
-                Sell Price
-              </p>
-              <p className="text-[#2A2A2A] text-[18px] md:text-[20px] leading-7.5 font-circular-normal">
-                {selectedItem.sell_price}
-              </p>
-            </div>
-            <button
-              className="text-[#1B1B1B] md:text-[#009A49] font-circular-normal text-sm leading-6 cursor-pointer md:w-1/3 text-right border border-[#A0A0A0] rounded-xl py-3 px-6 md:py-0 md:px-0 md:border-none"
-              onClick={() => dispatch(openEditPrice())}
-            >
-              Edit
-            </button>
-          </div>
-
-          {/* Discount */}
-          <div className="flex p-3 items-center justify-between gap-5 rounded-md w-full border-b border-b-[#E9EEF3] md:border-none md:bg-[#F8FAFB]">
-            <div className="flex flex-col gap-1 w-2/3">
-              <p className="text-[#717171] text-[16px] md:text-[18px] font-circular-normal leading-7">
-                Discount
-              </p>
-              <p className="text-[#2A2A2A] text-[18px] md:text-[20px] leading-7.5 font-circular-normal">
-                {selectedItem.discount || 'Not Set'}
-              </p>
-            </div>
-            <button
-              className="text-[#1B1B1B] md:text-[#009A49] font-circular-normal text-sm leading-6 cursor-pointer md:w-1/3 text-right border border-[#A0A0A0] rounded-xl py-3 px-6 md:py-0 md:px-0 md:border-none"
-            >
-              Add
-            </button>
-          </div>
-
-          {/* Available */}
-          <div className="flex p-3 items-center justify-between gap-5 rounded-md w-full border-b border-b-[#E9EEF3] md:border-none md:bg-[#F8FAFB]">
-            <div className="flex flex-col gap-1 w-2/3">
-              <p className="text-[#717171] text-[16px] md:text-[18px] font-circular-normal leading-7">
-                Available
-              </p>
-              <p className="text-[#2A2A2A] text-[18px] md:text-[20px] leading-7.5 font-circular-normal">
-                {selectedItem.available}
-              </p>
-            </div>
-            <button
-              className="text-[#1B1B1B] md:text-[#009A49] font-circular-normal text-sm leading-6 cursor-pointer md:w-1/3 text-right border border-[#A0A0A0] rounded-xl py-3 px-6 md:py-0 md:px-0 md:border-none"
-              onClick={() => dispatch(openEditQuantity())}
-            >
-              Edit
-            </button>
-          </div>
-
-          {/* Quantity Sold */}
-          <div className="flex p-3 items-center justify-between gap-5 rounded-md w-full border-b border-b-[#E9EEF3] md:border-none md:bg-[#F8FAFB]">
-            <div className="flex flex-col gap-1 w-2/3">
-              <p className="text-[#717171] text-[16px] md:text-[18px] font-circular-normal leading-7">
-                Quantity Sold
-              </p>
-              <p className="text-[#2A2A2A] text-[18px] md:text-[20px] leading-7.5 font-circular-normal">
-                {selectedItem.quantitySold || "Not Set"}
-              </p>
-            </div>
-          </div>
-
-          {/* Image */}
-          <div className="flex p-3 items-center justify-between gap-5 rounded-md w-full border-b border-b-[#E9EEF3] md:border-none md:bg-[#F8FAFB]">
-            <div className="flex flex-col gap-1 w-2/3">
-              <p className="text-[#717171] text-[16px] md:text-[18px] font-circular-normal leading-7">
-                Image
-              </p>
-              <p className="text-[#2A2A2A] text-[18px] md:text-[20px] leading-7.5 font-circular-normal">
-                {selectedItem.image ? 'Image Set' : 'Not Set'}
-              </p>
-            </div>
-            <button
-              className="text-[#1B1B1B] md:text-[#009A49] font-circular-normal text-sm leading-6 cursor-pointer md:w-1/3 text-right border border-[#A0A0A0] rounded-xl py-3 px-6 md:py-0 md:px-0 md:border-none"
-              onClick={() => dispatch(openImageUploader())}
-            >
-              Add
-            </button>
-          </div>
+            {/* Other fields */}
+            {[
+              { label: "Cost Price", value: selectedItem?.buying_price || selectedItem?.cost_price || "N/A", editable: true },
+              { label: "Sell Price", value: selectedItem?.buying_price || selectedItem?.["sell_price"] || "N/A", editable: true },
+              { label: "Discount", value: selectedItem?.discount || "Not Set", editable: false },
+              { label: "Available", value: selectedItem?.stock || selectedItem?.quantity || "N/A", editable: true },
+              { label: "Quantity Sold", value: selectedItem?.original_quantity || selectedItem?.sold || "Not Set", editable: false },
+              { label: "Image", value: selectedItem?.image ? "Image Set" : "Not Set", editable: true }
+            ].map((item, index) => (
+              <div key={index} className="flex justify-between items-center p-3 mb-3 rounded-md bg-[#F8FAFB]">
+                <div>
+                  <p className="text-[#717171] text-sm">{item.label}</p>
+                  <p className="text-[#2A2A2A] font-medium">{item.value}</p>
+                </div>
+                {item.editable && (
+                  <button 
+                    onClick={() => {
+                      if (item.label === "Image") dispatch(openImageUploader());
+                      else if (item.label.includes("Price")) dispatch(openEditPrice());
+                      else if (item.label === "Available") dispatch(openEditQuantity());
+                    }}
+                    className="text-sm font-medium px-4 py-2 border border-[#A0A0A0] rounded-xl lg:border-none lg:text-[#009A49]"
+                  >
+                    {item.label === "Image" ? "Add" : "Edit"}
+                  </button>
+                )}
+              </div>
+            ))}
         </div>
 
-        {/* Mobile Buttons */}
-        <div className="w-full h-full p-4 flex flex-col md:hidden gap-4 mt-11">
-          <Button
-            className="bg-[#B8B8B8] text-white text-base font-circular-medium py-6 px-2 rounded-lg hover:border-b hover:border-b-primary transition-colors"
-            variant="default"
-            fullWidth
-          >
+        {/* Mobile buttons */}
+        <div className="lg:hidden p-4 border-t border-[#E9EEF3] sticky bottom-0 bg-white">
+          <Button className="w-full mb-3 bg-gray-200 text-gray-800 hover:bg-gray-300 h-12">
             Save
           </Button>
-          <Button
-            className="bg-white text-[#FF000D] text-base font-circular-medium px-2 py-6 border border-[#FF000D] rounded-lg hover:bg-[#FF000D] hover:text-white transition-colors"
-            variant="default"
-            fullWidth
-          >
-            Delete stock
+          <Button className="w-full bg-white text-red-600 border border-red-600 hover:bg-red-50 h-12">
+            Delete Stock
           </Button>
         </div>
       </div>
 
-      {/* Modals */}
       {isEditImageModalOpen && (
         <EditImage
           isOpen={isEditImageModalOpen}
