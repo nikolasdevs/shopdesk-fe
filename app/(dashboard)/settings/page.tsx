@@ -1,24 +1,25 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import profilePhoto from "@/public/Avatar.svg";
-import notification from "@/public/icons/_ui-bell-03.svg";
-import stock from "@/public/icons/_ui-box.svg";
-import business from "@/public/icons/_ui-briefcase-01.svg";
-import billing from "@/public/icons/_ui-credit-card-02.svg";
-import account from "@/public/icons/_ui-edit-02.svg";
-import user from "@/public/icons/_ui-user-edit.svg";
-import deleteIcon from "@/public/icons/_ui-trash-03-red.svg";
+// import Image from "next/image";
+// import { Button } from "@/components/ui/button";
+// import profilePhoto from "@/public/Avatar.svg";
+// import notification from "@/public/icons/_ui-bell-03.svg";
+// import stock from "@/public/icons/_ui-box.svg";
+// import business from "@/public/icons/_ui-briefcase-01.svg";
+// import billing from "@/public/icons/_ui-credit-card-02.svg";
+// import account from "@/public/icons/_ui-edit-02.svg";
+// import user from "@/public/icons/_ui-user-edit.svg";
+// import deleteIcon from "@/public/icons/_ui-trash-03-red.svg";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
-import Account from "./Account";
-import Buisness from "./Buisness";
-import StockPreference from "./stockpreference";
-import Notification from "./notification";
-import Billing from "./billing";
-import UserPermission from "./userpermission";
+import Account from "../dashboard/components/Account";
+import Buisness from "../dashboard/components/Buisness";
+import StockPreference from "../dashboard/components/stockpreference";
+import Notification from "../dashboard/components/notification";
+import Billing from "../dashboard/components/billing";
+import UserPermission from "../dashboard/components/userpermission";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 function Settings() {
   const [searchText, setSearchText] = useState("");
@@ -26,6 +27,7 @@ function Settings() {
 
   return (
     <div className="space-y-8 w-full h-full md:mt-8 mt-4">
+          <DashboardHeader />
       <div className="space-y-0 w-full ">
         <Tabs defaultValue="account" className="w-auto gap-0 ">
           <div className="gap-4 items-center hidden lg:flex ">
