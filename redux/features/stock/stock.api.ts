@@ -33,9 +33,20 @@ export const accessControlApi = api.injectEndpoints({
     getStocks: builder.mutation<StockResponse[], string>({
       query: (organizatiohn_id: string) => ({
         url: `stocks/?organization_id=${organizatiohn_id}`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: ['Stock'],
+      invalidatesTags: ["Stock"],
+    }),
+    editStock: builder.mutation<StockResponse, EditStockRequest>({
+      query: (data) => ({
+        url: `stocks/edit`,
+        method: "PUT",
+        body: {
+          stock_id: data.id,
+          ...data,
+        },
+      }),
+      invalidatesTags: ["Stock"],
     }),
 
     addStock: builder.mutation<StockResponse, {
@@ -89,5 +100,6 @@ export const {
   // useEditStockMutation,
   // useDeleteStockMutation,
   useAddStockMutation,
+  useEditStockMutation,
   useGetStocksMutation,
 } = accessControlApi;
