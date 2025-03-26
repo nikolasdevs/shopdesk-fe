@@ -5,7 +5,6 @@ import { Icons } from "@/components/ui/icons";
 
 const TabNavigation = () => {
   const pathname = usePathname();
-  console.log("pathname", pathname);
 
   const tabs = [
     {
@@ -46,7 +45,6 @@ const TabNavigation = () => {
     <div className="w-full flex border border-b-0 max-w-fit rounded-t-lg overflow-hidden bg-[#F6F8FA] p-1 pb-0">
       {tabs.map((tab) => {
         const isActive = pathname === tab.path;
-        console.log("isActive", isActive, tab);
 
         return (
           <Link key={tab.name} href={tab.path}>
