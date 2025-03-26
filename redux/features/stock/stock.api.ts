@@ -1,4 +1,4 @@
-import { api } from '@/redux/api';
+import { api } from "@/redux/api";
 
 interface StockBase {
   id: string;
@@ -32,9 +32,20 @@ export const accessControlApi = api.injectEndpoints({
     getStocks: builder.mutation<StockResponse[], string>({
       query: (organizatiohn_id: string) => ({
         url: `stocks/?organization_id=${organizatiohn_id}`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: ['Stock'],
+      invalidatesTags: ["Stock"],
+    }),
+    editStock: builder.mutation<StockResponse, EditStockRequest>({
+      query: (data) => ({
+        url: `stocks/edit`,
+        method: "PUT",
+        body: {
+          stock_id: data.id,
+          ...data,
+        },
+      }),
+      invalidatesTags: ["Stock"],
     }),
 
     // createStock: builder.mutation<
@@ -71,6 +82,6 @@ export const {
   // useCreateStockMutation,
   // useEditStockMutation,
   // useDeleteStockMutation,
-
+  useEditStockMutation,
   useGetStocksMutation,
 } = accessControlApi;

@@ -41,3 +41,36 @@ export async function fetchStocks(organization_id: string) {
     return { error: "Internal Server Error", details: error?.message || error };
   }
 }
+
+export async function editStock(data: { id: string; [key: string]: any }) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("access_token")?.value;
+
+    if (!accessToken) {
+      return { error: "Missing authorization token" };
+    }
+
+    const response = await fetch(`https://api.timbu.cloud/stocks/${data.id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        stock_id: data.id,
+        ...data,
+      }),
+    });
+    console.log("response:", response);
+    if (!response.ok) {
+      return { error: "Failed to update stock", status: response.status };
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    console.error("Error in server action:", error);
+    return { error: "Internal Server Error", details: error.message || error };
+  }
+}

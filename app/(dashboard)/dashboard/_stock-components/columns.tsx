@@ -53,6 +53,8 @@ export const columns: ColumnDef<Stock>[] = [
       return (
         <EditableCell
           value={value}
+          accessorKey="name"
+          stockId={row.original.id}
           onChange={(val) => {
             row.original.name = val;
             // Optional: sync this update to local state or backend
@@ -72,7 +74,9 @@ export const columns: ColumnDef<Stock>[] = [
       return (
         <EditableCell
           value={value}
+          accessorKey="buying_price"
           currency={row.original.currency_code}
+          stockId={row.original.id}
           onChange={(val) => {
             row.original.buying_price = val;
           }}
@@ -93,7 +97,9 @@ export const columns: ColumnDef<Stock>[] = [
 
       return (
         <EditableCell
-          value={value}
+          value={value || "0"}
+          accessorKey="quantity"
+          stockId={row.original.id}
           onChange={(val) => {
             row.original.quantity = val;
           }}
