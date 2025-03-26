@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import { StockItem } from "@/components/stock-components/page";
 import { SalesItem } from "@/store/useStore";
+import { Plus, Search } from "lucide-react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Search, Plus } from "lucide-react";
-import { StockItem } from "@/app/(dashboard)/dashboard/page";
 
 interface SalesTabProps {
   onAddSale: (sale: SalesItem) => void;
