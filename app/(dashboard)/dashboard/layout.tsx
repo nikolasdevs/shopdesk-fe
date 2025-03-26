@@ -1,6 +1,7 @@
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardActions from "@/components/dashboard/DashboardActions";
 import TabNavigation from "@/components/dashboard/TabNavigation";
+import SettingsWrapper from "@/components/dashboard/SettingsWrapper";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -8,6 +9,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="space-y-8 w-full h-full">
         {/* Header/Navbar */}
         <DashboardHeader />
+
+        <SettingsWrapper />
 
         {/* Main Section */}
         <div className="space-y-0 w-full ">

@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
 import Image from "next/image";
-import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
+import { useState } from "react";
+import { FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 //import { editStockv3 } from '@/services/stock'
-import { StockItem } from "@/app/(dashboard)/dashboard/page";
+import { StockItem } from "@/components/stock-components/page";
 
 interface EditStockV3ModalProps {
   isOpen: boolean;
