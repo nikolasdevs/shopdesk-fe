@@ -1,7 +1,7 @@
-import React from 'react';
-import { X } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { RootState } from '@/redux/store';
+import React from "react";
+import { X } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 import {
   closeSidebar,
   openEditModal,
@@ -20,15 +20,15 @@ import {
   closeEditImageModal,
   saveItem,
 } from "@/redux/features/sidebar";
-import ImageUploader from '@/components/modal/add-image';
-import { Button } from '@/components/ui/button';
-import EditStockV3Modal from '../modal/modalV3/edit-stock';
-import EditPriceModal from '../modal/modalV3/edit-price';
-import EditStockName from '../modal/modalV3/edit-name';
-import EditQuantityModal from '../modal/modalV3/edit-quantity';
-import EditSuccessModal from '../modal/modalV3/edit-success';
-import EditImage from '../modal/edit-image';
-import Logo from './logo';
+import ImageUploader from "@/components/modal/add-image";
+import { Button } from "@/components/ui/button";
+import EditStockV3Modal from "../modal/modalV3/edit-stock";
+import EditPriceModal from "../modal/modalV3/edit-price";
+import EditStockName from "../modal/modalV3/edit-name";
+import EditQuantityModal from "../modal/modalV3/edit-quantity";
+import EditSuccessModal from "../modal/modalV3/edit-success";
+import EditImage from "../modal/edit-image";
+import Logo from "./logo";
 
 interface SidebarProps {
   selectedItem: any;
@@ -66,15 +66,20 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedItem, onClose }) => {
   return (
     <>
       {/* Mobile overlay */}
-      <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
-      
+      <div
+        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        onClick={onClose}
+      />
+
       {/* Main sidebar container */}
       <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[100vw] bg-white shadow-lg lg:relative lg:w-[356px] lg:border lg:border-[#DEE5ED] flex flex-col overflow-y-auto">
-        
         {/* Desktop header */}
         <div className="hidden lg:flex p-4 items-center justify-between border-b border-[#DEE5ED]">
           <h2 className="text-xl font-semibold">{selectedItem.name}</h2>
-          <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-100">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-md hover:bg-gray-100"
+          >
             <X size={16} />
           </button>
         </div>
@@ -82,57 +87,96 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedItem, onClose }) => {
         {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-[#DEE5ED] sticky top-0 bg-white z-10">
           <Logo />
-          <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-100">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-md hover:bg-gray-100"
+          >
             <X size={16} />
           </button>
         </div>
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto p-4">
-            {/* Product Name */}
-            <div className="flex justify-between items-center p-3 mb-3 rounded-md bg-[#F8FAFB]">
-              <div>
-                <p className="text-[#717171] text-sm">Product name</p>
-                <p className="text-[#2A2A2A] font-medium">
-                  {selectedItem?.name || selectedItem?.productName || "No name"}
-                </p>
-              </div>
-              <button 
-                onClick={() => dispatch(openEditName())}
-                className="text-sm font-medium px-4 py-2 border border-[#A0A0A0] rounded-xl lg:border-none lg:text-[#009A49]"
-              >
-                Edit
-              </button>
+          {/* Product Name */}
+          <div className="flex justify-between items-center p-3 mb-3 rounded-md bg-[#F8FAFB]">
+            <div>
+              <p className="text-[#717171] text-sm">Product name</p>
+              <p className="text-[#2A2A2A] font-medium">
+                {selectedItem?.name || selectedItem?.productName || "No name"}
+              </p>
             </div>
+            <button
+              onClick={() => dispatch(openEditName())}
+              className="text-sm font-medium px-4 py-2 border border-[#A0A0A0] rounded-xl lg:border-none lg:text-[#009A49]"
+            >
+              Edit
+            </button>
+          </div>
 
-            {/* Other fields */}
-            {[
-              { label: "Cost Price", value: selectedItem?.buying_price || selectedItem?.cost_price || "N/A", editable: true },
-              { label: "Sell Price", value: selectedItem?.buying_price || selectedItem?.["sell_price"] || "N/A", editable: true },
-              { label: "Discount", value: selectedItem?.discount || "Not Set", editable: false },
-              { label: "Available", value: selectedItem?.stock || selectedItem?.quantity || "N/A", editable: true },
-              { label: "Quantity Sold", value: selectedItem?.original_quantity || selectedItem?.sold || "Not Set", editable: false },
-              { label: "Image", value: selectedItem?.image ? "Image Set" : "Not Set", editable: true }
-            ].map((item, index) => (
-              <div key={index} className="flex justify-between items-center p-3 mb-3 rounded-md bg-[#F8FAFB]">
-                <div>
-                  <p className="text-[#717171] text-sm">{item.label}</p>
-                  <p className="text-[#2A2A2A] font-medium">{item.value}</p>
-                </div>
-                {item.editable && (
-                  <button 
-                    onClick={() => {
-                      if (item.label === "Image") dispatch(openImageUploader());
-                      else if (item.label.includes("Price")) dispatch(openEditPrice());
-                      else if (item.label === "Available") dispatch(openEditQuantity());
-                    }}
-                    className="text-sm font-medium px-4 py-2 border border-[#A0A0A0] rounded-xl lg:border-none lg:text-[#009A49]"
-                  >
-                    {item.label === "Image" ? "Add" : "Edit"}
-                  </button>
-                )}
+          {/* Other fields */}
+          {[
+            {
+              label: "Cost Price",
+              value:
+                selectedItem?.buying_price || selectedItem?.cost_price || "N/A",
+              editable: true,
+            },
+            {
+              label: "Sell Price",
+              value:
+                selectedItem?.buying_price ||
+                selectedItem?.["sell_price"] ||
+                "N/A",
+              editable: true,
+            },
+            {
+              label: "Discount",
+              value: selectedItem?.discount || "Not Set",
+              editable: false,
+            },
+            {
+              label: "Available",
+              value: selectedItem?.stock || selectedItem?.quantity || "N/A",
+              editable: true,
+            },
+            {
+              label: "Quantity Sold",
+              value:
+                selectedItem?.original_quantity ||
+                selectedItem?.sold ||
+                "Not Set",
+              editable: false,
+            },
+            {
+              label: "Image",
+              value: selectedItem?.image ? "Image Set" : "Not Set",
+              editable: true,
+            },
+          ].map((item, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center p-3 mb-3 rounded-md bg-[#F8FAFB]"
+            >
+              <div>
+                <p className="text-[#717171] text-sm">{item.label}</p>
+                <p className="text-[#2A2A2A] font-medium">{item.value}</p>
               </div>
-            ))}
+              {item.editable && (
+                <button
+                  onClick={() => {
+                    if (item.label === "Image") dispatch(openImageUploader());
+                    else if (item.label.includes("Price"))
+                      dispatch(openEditPrice());
+                    else if (item.label === "Available")
+                      dispatch(openEditQuantity());
+                  }}
+                  className="text-sm font-medium px-4 py-2 border border-[#A0A0A0] rounded-xl lg:border-none lg:text-[#009A49]"
+                >
+                  {item.label === "Image" ? "Add" : "Edit"}
+                </button>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Mobile buttons */}
@@ -223,6 +267,4 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedItem, onClose }) => {
     </>
   );
 };
-
-
 export default Sidebar;
