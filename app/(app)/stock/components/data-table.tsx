@@ -1,6 +1,5 @@
-'use client';
+"use client";
 
-import * as React from 'react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -14,7 +13,8 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
+import * as React from "react";
 
 import {
   Table,
@@ -23,24 +23,31 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 
-import { DataTablePagination } from './data-table-pagination';
-import { DataTableToolbar } from './data-table-toolbar';
-import Sidebar from '@/components/functional/sidebar';
+import Sidebar from "@/components/functional/sidebar";
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  loading,
+  error,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [selectedRow, setSelectedRow] = React.useState<TData | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
@@ -73,24 +80,24 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div className='flex space-x-4 w-full h-full'>
+    <div className="flex space-x-4 w-full h-full">
       {/* Main table container */}
-      <div className='flex-1 flex flex-col space-y-4 border border-gray-200 rounded-lg overflow-hidden'>
-        <div className='p-4 border-b'>
+      <div className="flex-1 flex flex-col min-w-[900px] border border-gray-200 rounded-lg overflow-x-auto">
+        <div className="p-4 border-b">
           <DataTableToolbar table={table} />
         </div>
-        
+
         {/* Table wrapper with scroll */}
-        <div className='flex-1 overflow-auto p-2'>
-          <Table className='w-full border-collapse'>
-            <TableHeader className='bg-gray-50'>
+        <div className="flex-1 overflow-x-auto px-2 pb-2">
+          <Table className="min-w-full">
+            <TableHeader className="bg-gray-50 min-w-full">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className='px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-r border-gray-200 last:border-r-0'
+                      className="px-4 py-3 text-left min-w-full text-sm font-medium text-gray-700 border-b border-r border-gray-200 last:border-r-0"
                     >
                       {header.isPlaceholder
                         ? null
@@ -104,18 +111,36 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    Loading stocks...
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-red-500 oveflow-x-auto"
+                  >
+                    {error}
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
+                    data-state={row.getIsSelected() && "selected"}
                     onClick={() => handleRowClick(row.original)}
-                    className='hover:bg-gray-50 cursor-pointer'
+                    className="hover:bg-gray-50 cursor-pointer oveflow-x-auto"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell 
-                        key={cell.id} 
-                        className='px-4 py-3 text-sm text-gray-800 border-b border-r border-gray-200 last:border-r-0'
+                      <TableCell
+                        key={cell.id}
+                        className="px-4 py-3 text-sm text-gray-800 border-b border-r border-gray-200 last:border-r-0"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -129,7 +154,7 @@ export function DataTable<TData, TValue>({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className='h-24 text-center text-gray-500 border-b border-gray-200'
+                    className="h-24 text-center text-gray-500 border-b border-gray-200"
                   >
                     No results found.
                   </TableCell>
@@ -138,16 +163,19 @@ export function DataTable<TData, TValue>({
             </TableBody>
           </Table>
         </div>
-        
+
         {/* Pagination */}
-        <div className='sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3'>
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3">
           <DataTablePagination table={table} />
         </div>
       </div>
-      
+
       {/* Sidebar */}
       {isSidebarOpen && selectedRow && (
-        <Sidebar selectedItem={selectedRow} onClose={() => setIsSidebarOpen(false)} />
+        <Sidebar
+          selectedItem={selectedRow}
+          onClose={() => setIsSidebarOpen(false)}
+        />
       )}
     </div>
   );

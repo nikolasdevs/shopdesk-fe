@@ -1,48 +1,51 @@
-'use client';
+"use client";
 
-import type { ColumnDef } from '@tanstack/react-table';
-import { Checkbox } from '@/components/ui/checkbox';
-import type { Stock } from '../data/schema';
-import { DataTableColumnHeader } from './data-table-column-header';
-import { DataTableRowActions } from './data-table-row-actions';
-import { EditableCell } from './editable-cell';
-import { Icons } from '@/components/ui/icons';
-import { Button } from '@/components/ui/button';
+import { fetchWeekdaySalesCount } from "@/actions/sales";
+import { Icons } from "@/components/ui/icons";
+import { useStore } from "@/store/useStore";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
+import type { Stock } from "../data/schema";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
+import { EditableCell } from "./editable-cell";
+import { ProfitColumnHeader } from "./profit-column/profit-column-header";
+import { SalesColumnHeader } from "./sales-column/sales-column-header";
 
 export const columns: ColumnDef<Stock>[] = [
+  // {
+  //   id: 'select',
+  //   header: ({ table }) => (
+  //     <div className='h-full p-2 w-full flex items-center justify-center'>
+  //       <Checkbox
+  //         checked={
+  //           table.getIsAllPageRowsSelected() ||
+  //           (table.getIsSomePageRowsSelected() && 'indeterminate')
+  //         }
+  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //         aria-label='Select all'
+  //         className='trans '
+  //       />
+  //     </div>
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label='Select row'
+  //       className='absolute left-1/2 -translate-x-1/2 bottom-1/3 -translate-y-1/2'
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
-    id: 'select',
-    header: ({ table }) => (
-      <div className='h-full p-2 w-full flex items-center justify-center'>
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label='Select all'
-          className='trans '
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
-        className='absolute left-1/2 -translate-x-1/2 bottom-1/3 -translate-y-1/2'
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'name',
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='ITEM NAME' />
+      <DataTableColumnHeader column={column} title="ITEM NAME" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue<string>('name');
+      const value = row.getValue<string>("name");
       return (
         <EditableCell
           value={value}
@@ -55,12 +58,12 @@ export const columns: ColumnDef<Stock>[] = [
     },
   },
   {
-    accessorKey: 'buying_price',
+    accessorKey: "buying_price",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='SELL PRICE' />
+      <DataTableColumnHeader column={column} title="SELL PRICE" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue<string>('buying_price');
+      const value = row.getValue<string>("buying_price");
 
       return (
         <EditableCell
@@ -72,16 +75,17 @@ export const columns: ColumnDef<Stock>[] = [
         />
       );
     },
+    size: 100,
   },
   {
-    accessorKey: 'available',
+    accessorKey: "available",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='AVAILABLE' />
+      <DataTableColumnHeader column={column} title="AVAILABLE" />
     ),
     cell: ({ row }) => {
       const value = row.original.quantity;
 
-      console.log(value, 'value');
+      // console.log(value, "value");
 
       return (
         <EditableCell
@@ -92,67 +96,110 @@ export const columns: ColumnDef<Stock>[] = [
         />
       );
     },
+    size: 100,
   },
   {
-    accessorKey: 'sales',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        className='flex items-center justify-center'
-      >
-        <Button className='bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] border border-[#DEE5ED] uppercase text-lg text-[#090F1C] py-1.5 px-4 h-auto'>
-          SHOW SALES
-        </Button>
-      </DataTableColumnHeader>
-    ),
-    cell: ({ row }) => {
-      const value = row.getValue<string>('available');
+    accessorKey: "sales",
+    header: ({ table }) => <SalesColumnHeader table={table} />,
+    cell: ({ row, table }) => {
+      const isExpanded =
+        (table.options.meta as { isSalesExpanded?: boolean })
+          ?.isSalesExpanded || false;
+
+      const [salesData, setSalesData] = useState<Record<string, number> | null>(
+        null
+      );
+      const [loading, setLoading] = useState(false);
+      const { organizationId } = useStore();
+      useEffect(() => {
+        if (isExpanded) {
+          setLoading(true);
+          fetchWeekdaySalesCount(organizationId, row.original.id)
+            .then((data) => setSalesData(data))
+            .catch(() => setSalesData(null))
+            .finally(() => setLoading(false));
+        }
+      }, [isExpanded, organizationId, row.original.id]);
+
+      if (!isExpanded) {
+        const totalSales = [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+        ].reduce((acc, day) => acc + (row.original[`sales_${day}`] || 0), 0);
+
+        return (
+          <div className="flex items-center justify-center">{totalSales}</div>
+        );
+      }
+
+      if (!isExpanded) {
+        return (
+          <div className="flex items-center justify-center">
+            {String(row.getValue("sales") || 0)}
+          </div>
+        );
+      }
+
       return (
-        <EditableCell
-          value={value}
-          onChange={(val) => {
-            row.original.available = val;
-          }}
-        />
+        <div className="grid grid-cols-7 gap-2">
+          {["monday", "tuesday", "wednesday", "thursday", "friday"].map(
+            (day) => (
+              <div
+                key={day}
+                className="border-none p-5 rounded-none text-sm w-full h-full"
+              >
+                {loading ? "Loading..." : salesData ? salesData[day] : "N/A"}
+              </div>
+            )
+          )}
+        </div>
       );
     },
-    enableSorting: false,
+    enableSorting: true,
   },
   {
-    accessorKey: 'profitGroup',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        className='flex items-center justify-center'
-      >
-        <Button className='bg-[#F6F8FA] hover:bg-[#F6F8FA]/80 duration-150 transition-all rounded-[6px] border border-[#DEE5ED] uppercase text-lg text-[#090F1C] py-1.5 px-4 h-auto'>
-          SHOW PROFIT
-        </Button>
-      </DataTableColumnHeader>
-    ),
-    cell: ({ row }) => {
-      const value = row.getValue<string>('available');
+    accessorKey: "profitGroup",
+    header: ({ table }) => <ProfitColumnHeader table={table} />,
+    cell: ({ row, table }) => {
+      const isExpanded =
+        (table.options.meta as { isProfitExpanded?: boolean })
+          ?.isProfitExpanded || false;
+      const calculatedProfit =
+        Number(row.original.buying_price) - Number(row.original.cost_price);
+      if (!isExpanded) {
+        return (
+          <div className="flex items-center justify-center">
+            {calculatedProfit.toFixed(2) || 0}
+          </div>
+        );
+      }
+
       return (
-        <EditableCell
-          value={value}
-          onChange={(val) => {
-            row.original.available = val;
-          }}
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <div className="border-none p-5  rounded-none text-sm w-full h-full focus-visible:outline-none focus-visible:border-2 focus-visible:ring-[#B2E1C8] focus-visible:z-10 relative">
+            {String(row.original.cost_price || 0)}
+          </div>
+          <div className="border-none p-5  rounded-none text-sm w-full h-full focus-visible:outline-none focus-visible:border-2 focus-visible:ring-[#B2E1C8] focus-visible:z-10 relative">
+            {calculatedProfit.toFixed(2) || 0}
+          </div>
+        </div>
       );
     },
-    enableSorting: false,
+    enableSorting: true,
   },
   {
-    id: 'actions',
+    id: "actions",
     header: ({ column }) => {
       return (
         <div
-          className='h-full py-5 px-4 flex items-center justify-center bg-transparent hover:bg-black/10 transition-all duration-150 shadow-none cursor-pointer'
-          title='Add new Column'
+          className="h-full py-5 px-4 flex items-center justify-center bg-transparent hover:bg-black/10 transition-all duration-150 shadow-none cursor-pointer"
+          title="Add new Column"
         >
-          <div className='py-1.5 px-2'>
-            <Icons.plus className='shrink-0' />
+          <div className="py-1.5 px-2">
+            <Icons.plus className="shrink-0" />
           </div>
         </div>
       );
