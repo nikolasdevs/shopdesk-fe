@@ -1,4 +1,5 @@
 import { api } from '@/redux/api';
+import { string } from 'zod';
 
 interface StockBase {
   id: string;
@@ -37,6 +38,22 @@ export const accessControlApi = api.injectEndpoints({
       invalidatesTags: ['Stock'],
     }),
 
+    addStock: builder.mutation<StockResponse, {
+      name: string;
+      buying_price: number;
+      currency_code: string;
+      organization_id: string;
+      product_id: string;
+      date_created: string;
+    }>({
+      query: (stockData) => ({
+        url: 'stocks/create',
+        method: 'POST',
+        body: stockData
+      }),
+      invalidatesTags: ['Stock'],
+    })
+
     // createStock: builder.mutation<
     //   APIResponse<StockResponse>,
     //   CreateStockRequest
@@ -71,6 +88,6 @@ export const {
   // useCreateStockMutation,
   // useEditStockMutation,
   // useDeleteStockMutation,
-
+  useAddStockMutation,
   useGetStocksMutation,
 } = accessControlApi;
