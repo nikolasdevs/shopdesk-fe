@@ -1,8 +1,7 @@
-import { act, render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
-import Page from "@/app/(dashboard)/dashboard/page";
-import { getAccessToken } from "@/app/api/token";
+import Page from "@/components/stock-components/page";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -87,7 +86,7 @@ describe("Dashboard Page", () => {
       deleteStock: vi.fn(() => Promise.resolve({})),
     }));
 
-    const UpdatedPage = (await import("@/app/(dashboard)/dashboard/page")).default;
+    const UpdatedPage = (await import("@/components/stock-components/page")).default;
 
     render(<UpdatedPage />);
 
