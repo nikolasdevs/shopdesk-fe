@@ -153,6 +153,14 @@ type Sale = {
   handling_time_end: string;
 };
 
+type WeeklySalesData = {
+  monday: number;
+  tuesday: number;
+  wednesday: number;
+  thursday: number;
+  friday: number;
+};
+
 export type {
   ContactInfo,
   ExtraInfo,
@@ -163,4 +171,5 @@ export type {
   SoldProduct,
   Stock,
   Supplier,
+  WeeklySalesData,
 };

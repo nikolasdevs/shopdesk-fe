@@ -11,9 +11,9 @@ export async function fetchWeekdaySalesCount(
 ) {
   try {
     const cookieStore = await cookies();
-    const refreshToken = cookieStore.get("refresh_token")?.value;
+    const accessToken = cookieStore.get("access_token")?.value;
 
-    if (!organization_id || !product_id || !date_range_end) {
+    if (!organization_id || !product_id) {
       return { error: "Missing required query parameters" };
     }
 
@@ -26,12 +26,12 @@ export async function fetchWeekdaySalesCount(
       sale_status,
     };
 
-    // Append only provided parameters
+    // append only provided parameters
     Object.entries(params).forEach(([key, value]) => {
       if (value) url.searchParams.append(key, value);
     });
 
-    // Ensure at least one parameter is provided
+    // ensure at least one parameter is provided
     if (!url.searchParams.toString()) {
       return { error: "At least one query parameter is required." };
     }
@@ -39,18 +39,19 @@ export async function fetchWeekdaySalesCount(
     const res = await fetch(url.toString(), {
       method: "GET",
       headers: {
+        Authorization: `Bearer ${accessToken}`,
         Accept: "application/json",
-        Cookie: refreshToken ? `refresh_token=${refreshToken}` : "",
+        "Content-Type": "application/json",
       },
     });
 
     if (!res.ok) {
-      return { error: "Failed to fetch sales data", status: res.status };
+      throw new Error(`Failed to fetch sales data: ${res.status}`);
     }
 
     return await res.json();
   } catch (error: any) {
     console.error("Error in server action:", error);
-    return { error: "Internal Server Error", details: error?.message || error };
+    throw new Error(error?.message || "Internal Server Error");
   }
 }
