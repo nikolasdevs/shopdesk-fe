@@ -3,11 +3,12 @@
 import { fetchWeekdaySalesCount } from "@/actions/sales";
 import { Icons } from "@/components/ui/icons";
 import { setWeeklySalesData } from "@/redux/features/sale/sale.slice";
+import { RootState } from "@/redux/store";
 import { useStore } from "@/store/useStore";
 import { WeeklySalesData } from "@/types/sale";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { Stock } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
@@ -109,34 +110,48 @@ export const columns: ColumnDef<Stock>[] = [
         (table.options.meta as { isSalesExpanded?: boolean })
           ?.isSalesExpanded || false;
 
-      const [salesData, setSalesData] = useState<Record<string, number> | null>(
-        null
-      );
       const [loading, setLoading] = useState(false);
       const { organizationId } = useStore();
       const dispatch = useDispatch();
+      const [error, setError] = useState<string>("");
+      const salesData = useSelector(
+        (state: RootState) => state.weeklySales.data
+      );
       useEffect(() => {
         if (isExpanded) {
           setLoading(true);
+          setError("");
+
           fetchWeekdaySalesCount(organizationId, row.original.id)
-            .then((data: WeeklySalesData) => {
-              setSalesData(data);
+            .then((data) => {
+              if (data.error) {
+                throw new Error(data.error);
+              }
               dispatch(setWeeklySalesData(data));
             })
-            .catch(() => setSalesData(null))
+            .catch((err) => {
+              console.error(err);
+              setError("Failed to fetch Weekly sales");
+              dispatch(
+                setWeeklySalesData({
+                  monday: 0,
+                  tuesday: 0,
+                  wednesday: 0,
+                  thursday: 0,
+                  friday: 0,
+                })
+              );
+            })
             .finally(() => setLoading(false));
         }
-      }, [isExpanded]);
+      }, [isExpanded, organizationId, row.original.id]);
 
       if (!isExpanded) {
-        const totalSales = [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-        ].reduce((acc, day) => acc + (row.original[`sales_${day}`] || 0), 0);
-
+        const totalSales = Object.values(salesData || {}).reduce(
+          (acc, val) => acc + val,
+          0
+        );
+        console.log(totalSales);
         return (
           <div className="flex items-center justify-center">{totalSales}</div>
         );
@@ -151,14 +166,14 @@ export const columns: ColumnDef<Stock>[] = [
       }
 
       return (
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-5 gap-2 w-full">
           {["monday", "tuesday", "wednesday", "thursday", "friday"].map(
             (day) => (
               <div
                 key={day}
-                className="border-none p-5 rounded-none text-sm w-full h-full"
+                className="border-r p-5 last:pr-5 rounded-none text-sm w-full h-full"
               >
-                {loading ? "Loading..." : salesData ? salesData[day] : "N/A"}
+                {error ? "0" : salesData?.[day as keyof WeeklySalesData] ?? "0"}
               </div>
             )
           )}

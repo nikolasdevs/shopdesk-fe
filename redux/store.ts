@@ -14,6 +14,8 @@ import notificationsReducer from "./notificationlslice";
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ["auth", "sidebar", "sales", "notification"],
+  blacklist: ["stocks", "weeklySales"],
 };
 
 type RootAction =

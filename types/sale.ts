@@ -159,8 +159,6 @@ type WeeklySalesData = {
   wednesday: number;
   thursday: number;
   friday: number;
-  saturday: number;
-  sunday: number;
 };
 
 export type {

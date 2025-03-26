@@ -44,14 +44,14 @@ export async function fetchWeekdaySalesCount(
         "Content-Type": "application/json",
       },
     });
-    console.log("res", res);
+
     if (!res.ok) {
-      return { error: "Failed to fetch sales data", status: res.status };
+      throw new Error(`Failed to fetch sales data: ${res.status}`);
     }
 
     return await res.json();
   } catch (error: any) {
     console.error("Error in server action:", error);
-    return { error: "Internal Server Error", details: error?.message || error };
+    throw new Error(error?.message || "Internal Server Error");
   }
 }
