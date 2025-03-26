@@ -89,7 +89,7 @@ export function DataTablePagination<TData>({
                   ? "bg-white text-[#2A2A2A] border-[#E2E8F0] font-bold"
                   : "border-[#E2E8F0] bg-white hover:bg-[#E2E8F0]"
               }`}
-              onClick={() => table.setPageIndex(page - 1)}
+              onClick={() => table.setPageIndex(Number(page) - 1)}
             >
               {page}
             </Button>
