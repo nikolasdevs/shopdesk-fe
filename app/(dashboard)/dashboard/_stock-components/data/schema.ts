@@ -8,20 +8,20 @@ export const stockSchema = z.object({
 });
 
 const StockSchema = z.object({
-  name: z.string(),
-  quantity: z.string(),
-  buying_price: z.string(),
-  currency_code: z.string(),
-  supplier_id: z.string().nullable(),
-  buying_date: z.string(),
+  name: z.string().optional(),
+  quantity: z.string().optional(),
+  buying_price: z.string().optional(),
+  currency_code: z.string().optional(),
+  supplier_id: z.string().nullable().optional(),
+  buying_date: z.string().optional(),
   id: z.string(),
-  product_id: z.string(),
-  status: z.string(),
-  user_id: z.string(),
-  date_created: z.string(),
-  original_quantity: z.number(),
-  supplier: z.null(),
-  timeslots: z.array(z.unknown()),
+  product_id: z.string().optional(),
+  status: z.string().optional(),
+  user_id: z.string().optional(),
+  date_created: z.string().optional(),
+  original_quantity: z.number().optional(),
+  supplier: z.null().optional(),
+  timeslots: z.array(z.unknown()).optional(),
 });
 
 export default StockSchema;
