@@ -20,6 +20,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log(row);
   return (
     <DropdownMenu>
