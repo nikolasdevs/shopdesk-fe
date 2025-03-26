@@ -1,3 +1,5 @@
+import type { ReactSVGElement } from 'react';
+
 export interface PaginatedResponse<T> {
   page: number;
   size: number;
@@ -16,4 +18,12 @@ export interface APIResponse<T> {
   status_code: number;
   message: string;
   data: T;
+}
+
+export interface Icons extends ReactSVGElement {}
+
+export interface Tabs {
+  name: string;
+  path: string;
+  icon?: Icons;
 }

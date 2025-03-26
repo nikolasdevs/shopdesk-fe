@@ -266,7 +266,7 @@ const CreateOrganization = () => {
       accessToken,
     });
     if ("data" in response) {
-      router.push("/dashboard");
+      router.push("/stock");
     } else {
       if (response.error && "data" in response.error) {
         setError(

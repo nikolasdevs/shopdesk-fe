@@ -1,6 +1,6 @@
-import { StockItem } from "@/components/stock-components/page";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import type { StockItem } from '@/types/stocks';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface SalesItem {
   sale_id: string;
@@ -44,22 +44,22 @@ interface StoreState {
 
 const getInitials = (name: string): string => {
   return name
-    .split(" ")
+    .split(' ')
     .map((word) => word.charAt(0).toUpperCase())
-    .join("");
+    .join('');
 };
 
 export const useStore = create<StoreState>()(
   persist(
     (set) => ({
       // Initial state
-      organizationId: "",
-      organizationName: "",
-      organizationInitial: "",
+      organizationId: '',
+      organizationName: '',
+      organizationInitial: '',
       stockItems: [],
       isPremium: false,
       isSearching: false,
-      searchText: "",
+      searchText: '',
       salesItems: [],
 
       // Actions
@@ -74,14 +74,14 @@ export const useStore = create<StoreState>()(
       setStockItems: (items) =>
         set((state) => ({
           stockItems:
-            typeof items === "function" ? items(state.stockItems) : items,
+            typeof items === 'function' ? items(state.stockItems) : items,
         })),
       setIsSearching: (isSearching) => set({ isSearching }),
       setSearchText: (searchText) => set({ searchText }),
       setSalesItems: (items) =>
         set((state) => ({
           salesItems:
-            typeof items === "function" ? items(state.salesItems) : items,
+            typeof items === 'function' ? items(state.salesItems) : items,
         })),
       addSale: (sale) =>
         set((state) => ({
@@ -95,7 +95,7 @@ export const useStore = create<StoreState>()(
         })),
     }),
     {
-      name: "shopdesk-store",
+      name: 'shopdesk-store',
     }
   )
 );
