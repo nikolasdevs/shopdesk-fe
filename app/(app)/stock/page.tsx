@@ -3,8 +3,10 @@
 import { fetchStocks } from "@/actions/stocks";
 // import { useGetStocksMutation } from "@/redux/features/stock/stock.api";
 // import { useAppSelector } from "@/redux/hooks";
+import { setStocksResponse } from "@/redux/features/stock/stock.slice";
 import { useStore } from "@/store/useStore";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 // import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -26,6 +28,7 @@ export default function StockPage() {
   const [stocks, setStocks] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (organizationId) {
@@ -35,6 +38,7 @@ export default function StockPage() {
         try {
           const response = await fetchStocks(organizationId);
           setStocks(response);
+          dispatch(setStocksResponse(response));
         } catch (err) {
           setError("Failed to fetch stocks");
         } finally {

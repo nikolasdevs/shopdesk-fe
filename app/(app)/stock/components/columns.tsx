@@ -2,9 +2,12 @@
 
 import { fetchWeekdaySalesCount } from "@/actions/sales";
 import { Icons } from "@/components/ui/icons";
+import { setWeeklySalesData } from "@/redux/features/sale/sale.slice";
 import { useStore } from "@/store/useStore";
+import { WeeklySalesData } from "@/types/sale";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import type { Stock } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
@@ -111,15 +114,19 @@ export const columns: ColumnDef<Stock>[] = [
       );
       const [loading, setLoading] = useState(false);
       const { organizationId } = useStore();
+      const dispatch = useDispatch();
       useEffect(() => {
         if (isExpanded) {
           setLoading(true);
           fetchWeekdaySalesCount(organizationId, row.original.id)
-            .then((data) => setSalesData(data))
+            .then((data: WeeklySalesData) => {
+              setSalesData(data);
+              dispatch(setWeeklySalesData(data));
+            })
             .catch(() => setSalesData(null))
             .finally(() => setLoading(false));
         }
-      }, [isExpanded, organizationId, row.original.id]);
+      }, [isExpanded]);
 
       if (!isExpanded) {
         const totalSales = [
