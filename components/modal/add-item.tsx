@@ -9,6 +9,7 @@ import { useAddStockMutation } from "@/redux/features/stock/stock.api"
 import { useAppSelector } from "@/redux/hooks"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FaMinus, FaPlus, FaTimes } from "react-icons/fa"
+import { useStorage } from "@/lib/helpers/manage-store"
 import { useEffect } from "react"
 
 interface StockResponse {
@@ -20,36 +21,46 @@ interface StockResponse {
   date_created: string
 }
 
-type StockCreatePayload = {
-  name: string
-  buying_price: number
-  quantity: number
-  currency_code: string
-  organization_id: string
-  product_id: string  
-  date_created: string
-}
-
 const formSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   buying_price: z.string()
     .min(1, "Price is required")
-    .refine(val => !isNaN(Number(val)), "Must be a number")
-    .transform(val => parseFloat(val))
-    .refine(val => val > 0, "Price must be greater than 0"),
+    .refine(val => !isNaN(Number(val)), "Must be a number"),
   quantity: z.string()
     .min(1, "Quantity is required")
-    .refine(val => !isNaN(Number(val)), "Must be a number")
-    .transform(val => parseInt(val))
-    .refine(val => val >= 1, "Quantity must be at least 1"),
+    .refine(val => !isNaN(Number(val)) && Number(val) >= 1, "Must be at least 1"),
   currency_code: z.string().min(1, "Currency is required"),
   product_id: z.string().min(1, "Product ID is required"), 
   organization_id: z.string().min(1, "Organization ID is required") 
 })
 
 export const currencies = [
-  { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
-  { code: "EGP", symbol: "ج.م", name: "Egyptian Pound" },
+  { code: "NGN", symbol: "₦", name: "Nigerian Naira", flag: "/modal-images/nigerian-flag.svg" },
+  { code: "EGP", symbol: "ج.م", name: "Egyptian Pound",flag: "/modal-images/egyptian-flag.svg"},
+  {
+    name: "Ethiopian Birr",
+    code: "ETB",
+    symbol: "Br",
+    flag: "/modal-images/ethiopia-flag.svg",
+  },
+  {
+    name: "Ghanaian Cedi",
+    code: "GHS",
+    symbol: "₵",
+    flag: "/modal-images/ghana-flag.svg",
+  },
+  {
+    name: "Indian Rupee",
+    code: "INR",
+    symbol: "₹",
+    flag: "/modal-images/india-flag.svg",
+  },
+  {
+    name: "Kenyan Shilling",
+    code: "KES",
+    symbol: "KSh",
+    flag: "/modal-images/kenya-flag.svg",
+  },
 ] as const
 
 interface AddStockModalProps {
@@ -59,27 +70,29 @@ interface AddStockModalProps {
 }
 
 function AddStockModal({ isOpen, onClose, onSave }: AddStockModalProps) {
-  const [addStock] = useAddStockMutation()
+  const [addStock, { isLoading }] = useAddStockMutation()
+  const { getAccessToken } = useStorage()
   const organizationId = useAppSelector(state => state.organization_id)
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      buying_price: 0,
-      quantity: 0,
+      buying_price: "",
+      quantity: "1",
       currency_code: "NGN",
-      product_id: "default-product-id", 
-      organization_id: organizationId || "default-org-id" 
+      product_id: "default-product-id",
+      organization_id: organizationId || "default-org-id"
     }
   })
 
-  // Reset form when opening/closing
+  // Reset form when opening or when organizationId changes
   useEffect(() => {
     if (isOpen) {
       form.reset({
         name: "",
-        buying_price: 0,
-        quantity: 0,
+        buying_price: "",
+        quantity: "1",
         currency_code: "NGN",
         product_id: "default-product-id",
         organization_id: organizationId || "default-org-id"
@@ -89,17 +102,30 @@ function AddStockModal({ isOpen, onClose, onSave }: AddStockModalProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const payload: StockCreatePayload = {
+      // Verify authentication before proceeding
+      const accessToken = getAccessToken()
+      if (!accessToken) {
+        throw { status: 401, data: { detail: "No access token found" } }
+      }
+
+      const payload = {
         ...values,
+        buying_price: Number(values.buying_price),
+        quantity: Number(values.quantity),
         date_created: new Date().toISOString()
       }
       
-      const response = await addStock(payload).unwrap()      
+      const response = await addStock(payload).unwrap()
       onSave(response)
       form.reset()
       onClose()
-    } catch (error) {
-      console.error("Failed to add stock:", error)
+    } catch (error: any) {
+      console.error("Failed to add stock:", error)   
+      if (error?.status === 401) {
+        alert("Your session has expired. Please log in again.")
+      } else {
+        alert((error as any)?.data?.detail || "Failed to add stock. Please try again.")
+      }
     }
   }
 
@@ -144,13 +170,11 @@ function AddStockModal({ isOpen, onClose, onSave }: AddStockModalProps) {
                         placeholder="0.00"
                         {...field}
                         onChange={(e) => {
-                          // Allow empty or valid numbers
                           const value = e.target.value
                           if (value === "" || !isNaN(Number(value))) {
                             field.onChange(value)
                           }
                         }}
-                        value={field.value}
                       />
                     </FormControl>
                     <FormMessage />
@@ -213,7 +237,6 @@ function AddStockModal({ isOpen, onClose, onSave }: AddStockModalProps) {
                             field.onChange(value)
                           }
                         }}
-                        value={field.value}
                       />
                     </FormControl>
                     <Button
@@ -237,8 +260,8 @@ function AddStockModal({ isOpen, onClose, onSave }: AddStockModalProps) {
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Adding..." : "Add Stock"}
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Adding..." : "Add Stock"}
               </Button>
             </div>
           </form>
