@@ -36,6 +36,8 @@ import {
 } from '@tanstack/react-table';
 import { getAccessToken } from '@/app/api/token';
 import Sidebar from '@/components/functional/sidebar';
+import StockPreference from './components/stockpreference';
+import { Button } from '@/components/ui/button';
 // import useTableAreaHeight from "./hooks/useTableAreaHeight";
 // import { Separator } from "@radix-ui/react-dropdown-menu";
 // import SalesTab from "@/components/functional/salestab";
@@ -153,6 +155,8 @@ const Page = () => {
 
   const totalItems = stockItems.length;
   const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+  const [showStockPreference, setShowStockPreference] = useState(false);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -993,6 +997,23 @@ const Page = () => {
         item={selectedItem!}
         onSave={handleSaveEdit}
       />
+
+      
+<div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Test Page</h1>
+      <Button
+        onClick={() => setShowStockPreference(!showStockPreference)}
+        className="px-6 py-3 text-base cursor-pointer"
+      >
+        {showStockPreference ? "Hide Stock Preference" : "Show Stock Preference"}
+      </Button>
+
+      {showStockPreference && (
+        <div className="mt-6">
+          <StockPreference />
+        </div>
+      )}
+    </div>
     </React.Fragment>
   );
 };
