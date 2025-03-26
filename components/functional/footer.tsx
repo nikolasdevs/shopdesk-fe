@@ -1,5 +1,4 @@
 import Link from "next/link";
-import React from "react";
 import Image from "next/image";
 import appStore from "../../public/icons/App Store.png";
 import playStore from "../../public/icons/Play Store.png";
@@ -7,6 +6,7 @@ import twitter from "../../public/icons/twitter.svg";
 import facebook from "../../public/icons/facebook.svg";
 import instagram from "../../public/icons/instagram.svg";
 import github from "../../public/icons/github.svg";
+import { FaTiktok } from "react-icons/fa6";
 import Logo from "./logo";
 
 const Footer = () => {
@@ -54,7 +54,7 @@ const Footer = () => {
               The simplest way to manage your shop!
             </p>
             <p className="text-base text-[#414141] underline underline-offset-4 mt-2">
-              208 Parisian Plains, Bulahport 27156, France
+              No. 2 Laula Ibrahim Street, Akoka, Lagos.
             </p>
 
             {/* Social Icons - Desktop */}

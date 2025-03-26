@@ -1,70 +1,101 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { StockItem } from "@/app/(dashboard)/dashboard/page";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type State = {
+export interface SalesItem {
+  sale_id: string;
+  product_id?: string;
+  product_name: string;
+  quantity_sold: number;
+  price_per_unit: number;
+  total_amount: number;
+  sale_date: string;
+}
+
+interface StoreState {
+  // Organization info
   organizationId: string;
   organizationName: string;
   organizationInitial: string;
+
+  // Stock management
+  stockItems: StockItem[];
+  isPremium: boolean;
+  isSearching: boolean;
+  searchText: string;
+
+  // Sales management
+  salesItems: SalesItem[];
+
+  // Actions
   setOrganizationId: (organizationId: string) => void;
   setOrganizationName: (organizationName: string) => void;
-  setOrganizationInitial: (organizationName: string) => void;
-};
+  setOrganizationInitial: (organizationInitial: string) => void;
+  setStockItems: (
+    items: StockItem[] | ((prev: StockItem[]) => StockItem[])
+  ) => void;
+  setIsSearching: (isSearching: boolean) => void;
+  setSearchText: (text: string) => void;
+  setSalesItems: (
+    items: SalesItem[] | ((prev: SalesItem[]) => SalesItem[])
+  ) => void;
+  addSale: (sale: SalesItem) => void;
+}
 
 const getInitials = (name: string): string => {
   return name
-    .split(' ')
+    .split(" ")
     .map((word) => word.charAt(0).toUpperCase())
-    .join('');
+    .join("");
 };
 
-export const useStore = create<State>()(
+export const useStore = create<StoreState>()(
   persist(
     (set) => ({
-      organizationId: '',
-      organizationName: '',
-      organizationInitial: '',
+      // Initial state
+      organizationId: "",
+      organizationName: "",
+      organizationInitial: "",
+      stockItems: [],
+      isPremium: false,
+      isSearching: false,
+      searchText: "",
+      salesItems: [],
+
+      // Actions
       setOrganizationId: (organizationId) => set({ organizationId }),
-      setOrganizationName: (organizationName) => set({ organizationName }),
-      setOrganizationInitial: (organizationName) =>
-        set({ organizationInitial: getInitials(organizationName) }),
+      setOrganizationName: (organizationName) =>
+        set({
+          organizationName,
+          organizationInitial: getInitials(organizationName),
+        }),
+      setOrganizationInitial: (organizationInitial) =>
+        set({ organizationInitial }),
+      setStockItems: (items) =>
+        set((state) => ({
+          stockItems:
+            typeof items === "function" ? items(state.stockItems) : items,
+        })),
+      setIsSearching: (isSearching) => set({ isSearching }),
+      setSearchText: (searchText) => set({ searchText }),
+      setSalesItems: (items) =>
+        set((state) => ({
+          salesItems:
+            typeof items === "function" ? items(state.salesItems) : items,
+        })),
+      addSale: (sale) =>
+        set((state) => ({
+          salesItems: [sale, ...state.salesItems],
+          // Optionally update stock quantities here
+          stockItems: state.stockItems.map((item) =>
+            item.product_id === sale.product_id
+              ? { ...item, quantity: item.quantity - sale.quantity_sold }
+              : item
+          ),
+        })),
     }),
     {
-      name: 'organization-store',
+      name: "shopdesk-store",
     }
   )
 );
-
-/*
-Usage for Stephen
-import useStore from 'path'
-
-const {organizationId, organizationName, setOrganizationId, setOrganizationName} = useStore(); // just destructure the properties that you need.
-
- TO SET A VALUE
-
-setOrganizationId('the_organization_id');
-or
-setOrganizationName('the_organization_name');
-
-TO USE THE STATE
-
-EXAMPLE:
-
-<p>Organization ID: {organizationId}</p>
-or 
-<p>Organization Name: {organizationName}</p>
-
-Or To send to an API route as request body
-
-const body = {
-  organizationId, // ensure you've set the organization id first
-  productId, // if available or needed
-  name: inputValueStateForName,
-} // and so on
-
- TO SEND TO API ROUTE AS A PARAMETER
-
- const apiUrl = `api/stocks/create?organization_id=${organizationId}`
-
- THANK YOU!!!!!!!!!!1
-*/
