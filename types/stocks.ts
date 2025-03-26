@@ -1,4 +1,3 @@
-// export interface Stock {}
 type Stock<T> = {
   page: number;
   size: number;
