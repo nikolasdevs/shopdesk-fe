@@ -23,14 +23,20 @@ const CustomDropdown = ({ options, defaultValue, selectWidth = "352px" }) => {
   const [selected, setSelected] = useState(defaultValue);
 
   return (
-    <div className={`relative w-full sm:w-[${selectWidth}]`}>
+    <div
+      className="relative w-full sm:w-[352px]"
+      style={{ maxWidth: selectWidth }}
+    >
       <div
-        className={`w-full sm:w-[${selectWidth}] h-[62px] border border-[#e9eaeb] rounded-[12px] p-2 font-circular-light text-[#535862] text-base leading-5 font-[400] bg-white cursor-pointer flex items-center justify-between`}
+        className="w-full h-[62px] border border-[#e9eaeb] rounded-[12px] p-2 font-circular-light text-[#535862] text-base leading-5 font-[400] bg-white cursor-pointer flex items-center justify-between"
+        style={{ maxWidth: selectWidth }}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{selected}</span>
         <svg
-          className={`w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-5 h-5 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -50,7 +56,9 @@ const CustomDropdown = ({ options, defaultValue, selectWidth = "352px" }) => {
             <div
               key={option.value}
               className={`w-[239px] h-[52px] px-4 py-4 border-b border-[#e9eaeb] last:border-b-0 font-circular-light text-[#535862] text-base leading-5 font-[400] cursor-pointer ${
-                selected === option.label ? "bg-[#E9EEF3]" : "hover:bg-[#E9EEF3]"
+                selected === option.label
+                  ? "bg-[#E9EEF3]"
+                  : "hover:bg-[#E9EEF3]"
               }`}
               onClick={() => {
                 setSelected(option.label);
@@ -84,7 +92,9 @@ const CurrencySelection = () => (
         selectWidth="358px"
       />
       <p className="font-circular-light text-[#535862] text-xs leading-5 font-[300] max-w-[358px]">
-        Changing the store currency will update how prices are displayed but will not automatically convert existing product prices. Ensure you update your pricing accordingly.
+        Changing the store currency will update how prices are displayed but
+        will not automatically convert existing product prices. Ensure you
+        update your pricing accordingly.
       </p>
     </div>
   </div>
@@ -176,7 +186,7 @@ const TaxSettings = () => (
             { value: "Sales Tax", label: "Sales Tax" },
           ]}
           defaultValue="VAT"
-          selectWidth="352px" 
+          selectWidth="352px"
         />
       </div>
     </div>
