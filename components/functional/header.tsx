@@ -43,7 +43,7 @@ const Header = () => {
         <Logo />
 
         <nav className="flex gap-6 text-[16px] max-[850px]:hidden">
-          <Link href="/#features" className="hover:text-green-500 transition">
+          <Link href="/features" className="hover:text-green-500 transition">
             Features
           </Link>
           <Link href="/pricing" className="hover:text-green-500 transition">
