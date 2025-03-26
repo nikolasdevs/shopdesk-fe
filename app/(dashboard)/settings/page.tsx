@@ -1,16 +1,16 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import Image from "next/image";
-// import { Button } from "@/components/ui/button";
-// import profilePhoto from "@/public/Avatar.svg";
-// import notification from "@/public/icons/_ui-bell-03.svg";
-// import stock from "@/public/icons/_ui-box.svg";
-// import business from "@/public/icons/_ui-briefcase-01.svg";
-// import billing from "@/public/icons/_ui-credit-card-02.svg";
-// import account from "@/public/icons/_ui-edit-02.svg";
-// import user from "@/public/icons/_ui-user-edit.svg";
-// import deleteIcon from "@/public/icons/_ui-trash-03-red.svg";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import profilePhoto from "@/public/Avatar.svg";
+import notification from "@/public/icons/_ui-bell-03.svg";
+import stock from "@/public/icons/_ui-box.svg";
+import business from "@/public/icons/_ui-briefcase-01.svg";
+import billing from "@/public/icons/_ui-credit-card-02.svg";
+import account from "@/public/icons/_ui-edit-02.svg";
+import user from "@/public/icons/_ui-user-edit.svg";
+import deleteIcon from "@/public/icons/_ui-trash-03-red.svg";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 import Account from "../dashboard/components/Account";
