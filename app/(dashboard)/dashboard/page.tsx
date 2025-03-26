@@ -1,17 +1,12 @@
 "use client";
-
 import { getAccessToken } from "@/app/api/token";
 import LoadingAnimation from "@/components/functional/loading";
-
+import PaginationFeature from "@/components/functional/paginationfeature";
+import ImageUploader from "@/components/modal/add-image";
 import AddItemModal from "@/components/modal/add-item";
+import DeleteItem from "@/components/modal/delete-item";
 import EditItemModal from "@/components/modal/edit-stock";
 import LogoutConfirmModal from "@/components/modal/logoutConfirmationModal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -20,19 +15,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import logout from "@/public/icons/_ui-log-out-02.svg";
-import settings from "@/public/icons/_ui-settings-01.svg";
-import viewDeleted from "@/public/icons/_ui-trash-03.svg";
 import box from "@/public/icons/box.svg";
 import { deleteStock, GetProduct, GetStock } from "@/services/stock";
 import { useStore } from "@/store/useStore";
-
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ChevronDown, Loader2, Plus, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FaSortDown } from "react-icons/fa";
-import useTableAreaHeight from "./hooks/useTableAreaHeight";
+
+import { Button } from "@/components/ui/button";
+import StockPreference from "./components/stockpreference";
+// import useTableAreaHeight from "./hooks/useTableAreaHeight";
+// import { Separator } from "@radix-ui/react-dropdown-menu";
+// import SalesTab from "@/components/functional/salestab";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
@@ -40,18 +48,6 @@ declare module "@tanstack/react-table" {
     updateData?: (rowIndex: number, key: string, value: string) => void;
   }
 }
-
-import Footer from "./components/Footer";
-import Settings from "./components/Settings";
-
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { ChevronDown, Loader2, Plus, Search, X } from "lucide-react";
-import TableContent from "./components/TableContent";
 
 export type StockItem = {
   id: string;
@@ -104,10 +100,12 @@ export type ProductItem = {
 
 import Logo from "@/components/functional/logo";
 import Sidebar from "@/components/functional/sidebar";
-import ImageUploader from "@/components/modal/add-image";
-import Image from "next/image";
-import Link from "next/link";
-import { useRef } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Page = () => {
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -118,9 +116,8 @@ const Page = () => {
   const { tableAreaRef, tableAreaHeight } = useTableAreaHeight();
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [organizationInitial, setOrganizationInitial] = useState("");
-
-  const [isOpen, setIsOpen] = useState(false);
+  //Active Tab
+  const [activeTab, setActiveTab] = useState("stock");
   const [openEdit, setOpenEdit] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
 
@@ -134,6 +131,7 @@ const Page = () => {
 
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
+
   const [isEditingTransition, setIsEditingTransition] = useState<string | null>(
     null
   );
@@ -318,8 +316,19 @@ const Page = () => {
     setCurrentPage(1);
   };
 
+  const handleInlineEdit = useCallback(
+    (item: StockItem, field: keyof StockItem = "name") => {
+      setIsEditingTransition(item.id);
+      setEditedItem({ ...item });
+      setActiveField(field);
+      setIsEditingTransition(null);
+    },
+    []
+  );
+
   const handleInputChange = useCallback(
     (field: keyof StockItem, value: string) => {
+      console.log("Input changed:", field, value);
       if (editedItem) {
         setEditedItem((prev) => ({
           ...prev!,
@@ -334,17 +343,6 @@ const Page = () => {
     [editedItem]
   );
 
-  const handleInlineEdit = useCallback(
-    (item: StockItem, field: keyof StockItem = "name") => {
-      console.log("Inline edit started:", item.id, field);
-      setIsEditingTransition(item.id);
-      setEditedItem({ ...item });
-      setActiveField(field);
-      setIsEditingTransition(null);
-    },
-    []
-  );
-
   const cancelEdit = useCallback(() => {
     setEditedItem(null);
     setActiveField(null);
@@ -353,7 +351,9 @@ const Page = () => {
   const handleSaveInline = async () => {
     if (!editedItem) return;
 
-    const organization_id = useStore.getState().organizationId;
+    console.log("Saving inline edit:", editedItem);
+
+    const organization_id = organizationId;
     try {
       const token = await getAccessToken();
       setIsEditingTransition(editedItem.id);
@@ -398,10 +398,18 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if (organizationId === "160db8736a9d47989381e01a987e4413") {
-      setIsPremium(true);
-    } else {
-      setIsPremium(false);
+    if (editedItem && activeField) {
+      switch (activeField) {
+        case "name":
+          nameInputRef.current?.focus();
+          break;
+        case "buying_price":
+          priceInputRef.current?.focus();
+          break;
+        case "quantity":
+          quantityInputRef.current?.focus();
+          break;
+      }
     }
   }, []);
 
@@ -742,25 +750,11 @@ const Page = () => {
     <main className="px-6 py-4 w-full max-w-7xl mx-auto flex flex-col main-h-svh ">
       <div ref={tableAreaRef} className="space-y-8 w-full h-full ">
         <LogoutConfirmModal
-          open={isMobileLogoutModalOpen || isDesktopLogoutModalOpen}
-          onOpenChange={(open) => {
-            if (!open) {
-              setIsMobileLogoutModalOpen(false);
-              setIsDesktopLogoutModalOpen(false);
-            }
-          }}
-          onCancel={() => {
-            setIsMobileLogoutModalOpen(false);
-            setIsDesktopLogoutModalOpen(false);
-          }}
-        />
-
-        <LogoutConfirmModal
           open={isLogoutModalOpen}
-          onOpenChange={(open) => setIsLogoutModalOpen(open)}
+          onOpenChange={setIsLogoutModalOpen}
+          onCancel={() => setIsLogoutModalOpen(false)}
         />
-
-        {/* <DeleteItem
+        <DeleteItem
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           onCancel={() => setIsDeleteModalOpen(false)}
@@ -770,104 +764,91 @@ const Page = () => {
               ? { product_id: selectedItem.product_id ?? "" }
               : undefined
           }
-        /> */}
+        />
         <div className="lg:border px-4 py-2 lg:shadow-md rounded-lg lg:flex items-center justify-between mx-auto">
           <div className="flex items-center gap-6">
+            {" "}
             <div className="flex justify-center lg:justify-start w-full lg:w-auto">
-              <Logo />
-            </div>
+              {" "}
+              <Logo />{" "}
+            </div>{" "}
             <small className="text-black text-left hidden lg:block">
-              The simplest way to manage your shop!
-            </small>
-          </div>
-
-          <DropdownMenu>
+              {" "}
+              The simplest way to manage your shop!{" "}
+            </small>{" "}
+          </div>{" "}
+          <DropdownMenu modal>
+            {" "}
             <DropdownMenuTrigger className="btn-primary hover:cursor-pointer hidden lg:flex items-center gap-2 text-white">
-              <Avatar className="rounded-lg">
-                <AvatarFallback className="text-black rounded-lg py-2 px-4 ">
-                  {organizationInitial}
-                </AvatarFallback>
-              </Avatar>
-              {organizationName}
-              <ChevronDown strokeWidth={1.5} color="white" />
-            </DropdownMenuTrigger>
+              {" "}
+              <span className="py-2 px-4 rounded-lg bg-white text-black">
+                {" "}
+                {organizationInitial}{" "}
+              </span>{" "}
+              {organizationName} <ChevronDown strokeWidth={1.5} color="white" />{" "}
+            </DropdownMenuTrigger>{" "}
             <DropdownMenuContent>
-              <DropdownMenuItem className="p-4  w-[200px] flex">
-                <Image src={viewDeleted} alt="" width={20} height={20} />
-                View Deleted
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/dashboard/settings"
-                  className="flex items-center gap-2 !p-4 w-[200px]"
-                >
-                  <Image
-                    src={settings}
-                    className=""
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
+              {" "}
               <DropdownMenuItem
-                className="p-4  w-[200px] text-[#ff1925] "
+                className=" p-4  w-[200px] "
                 onClick={() => setIsLogoutModalOpen(true)}
               >
-                <Image src={logout} alt="" width={20} height={20} />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
+                {" "}
+                <Image src={viewDeleted} alt="" width={20} height={20} /> View
+                Deleted{" "}
+              </DropdownMenuItem>{" "}
+              <DropdownMenuItem
+                className=" p-4  w-[200px] "
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
+                {" "}
+                <Image
+                  src={settings}
+                  alt=""
+                  width={20}
+                  height={20}
+                /> Settings{" "}
+              </DropdownMenuItem>{" "}
+              <DropdownMenuItem
+                className=" p-4  w-[200px] text-[#ff1925] "
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
+                {" "}
+                <Image src={logout} alt="" width={20} height={20} /> Log out{" "}
+              </DropdownMenuItem>{" "}
+            </DropdownMenuContent>{" "}
+          </DropdownMenu>{" "}
+        </div>{" "}
         <div className="space-y-0 w-full ">
+          {" "}
           <div className="w-full flex justify-between max-[800px]:flex-col-reverse">
+            {" "}
             <div>
+              {" "}
               <div className="flex items-center justify-center gap-2 border border-b-white py-2 rounded-tr-lg rounded-tl-lg w-44 max-[800px]:w-full font-semibold px-9 shadow-inner">
-                Stock
+                {" "}
+                Stock{" "}
                 <Image
                   src="/icons/ui-box.svg"
                   alt=""
                   width={20}
                   height={20}
                   className="w-5 h-5"
-                />
-              </div>
-
-              {/*<SalesTab
-               // onAddSale={() => {
-                //  console.log("Add sale action triggered");
+                />{" "}
+              </div>{" "}
+              {/*<SalesTab // onAddSale={() => { //  console.log("Add sale action triggered");
                  // console.log("Active tab:", activeTab);
                 //}}
              // /> */}
             </div>
             {stockItems.length > 0 && (
               <div className="mb-2 max-[800px]:mb-4 max-[640px]:self-end flex items-center justify-center max-[1000px]:flex-row-reverse max-[800px]:w-full">
-                <div className="relative group inline-block">
-                  {/* Tooltip */}
-                  {!isPremium && stockItems.length >= 10 && (
-                    <div className="z-50 absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded-md px-3 py-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                      Upgrade to Premium to add more.
-                      <a
-                        href="/dashboard/billing"
-                        className="text-blue-400 underline ml-1 "
-                      >
-                        Upgrade now
-                      </a>
-                    </div>
-                  )}
-
-                  {/* Button */}
-                  <button
-                    onClick={openModal}
-                    className="btn-primary max-[400px]:text-sm text-nowrap max-[1000px]:hidden mr-2 disabled:opacity-50"
-                    disabled={!isPremium && stockItems.length >= 10}
-                  >
-                    + Add New
-                  </button>
-                </div>
+                <button
+                  onClick={openModal}
+                  className="btn-primary max-[400px]:text-sm text-nowrap max-[1000px]:hidden mr-2"
+                >
+                  + Add New
+                </button>
                 <button
                   onClick={openModal}
                   className="btn-primary max-[400px]:text-sm text-nowrap min-[1000px]:hidden ml-2"
@@ -894,11 +875,11 @@ const Page = () => {
                 <div className="z-10">
                   <AddItemModal
                     isOpen={isOpen}
-                    onClose={closeAddModal}
+                    onClose={closeModal}
                     onSave={(newItem) => {
                       setStockItems((prev) => [newItem, ...prev]); // Inserts new items at the top
 
-                      closeAddModal();
+                      closeModal();
                     }}
                   />
                 </div>
@@ -915,7 +896,7 @@ const Page = () => {
               (isSearching && filteredItems.length === 0) ? (
                 <div className="relative w-full">
                   <Table className="bg-white border-0 border-collapse w-full">
-                    <TableHeader>
+                    <DataTableColumnHeader>
                       <TableHeader>
                         <TableRow className="h-[50px] ">
                           <TableHead className="text-[#090F1C] font-circular-medium text-left border-b border-r">
@@ -938,7 +919,7 @@ const Page = () => {
                           </TableHead>
                         </TableRow>
                       </TableHeader>
-                    </TableHeader>
+                    </DataTableColumnHeader>
                   </Table>
                   <div className="w-full overflow-x-auto">
                     <span className="w-full h-px bg-[#DEDEDE] block"></span>
@@ -964,10 +945,10 @@ const Page = () => {
                           </button>
                           <AddItemModal
                             isOpen={isOpen}
-                            onClose={closeAddModal}
+                            onClose={closeModal}
                             onSave={(newItem) => {
                               setStockItems((prev) => [newItem, ...prev]);
-                              closeAddModal();
+                              closeModal();
                             }}
                           />
                         </div>
@@ -1001,45 +982,53 @@ const Page = () => {
                           {headerGroup.headers.map((header) => {
                             let widthClass = "w-auto"; // Default width of the header columns
 
-                            // if (header.column.id === 'name') {
-                            //   widthClass =
-                            //     showSales && showProfit
-                            //       ? 'max-w-[259px]'
-                            //       : showSales
-                            //         ? 'max-w-[292px]'
-                            //         : showProfit
-                            //           ? 'max-w-[292px]'
-                            //           : 'max-w-[374px] pl-4';
-                            // } else if (header.column.id === 'sell_price') {
-                            //   widthClass =
-                            //     showSales && showProfit
-                            //       ? 'w-auto px-4'
-                            //       : showSales || showProfit
-                            //         ? 'w-[262px]'
-                            //         : 'w-[280px]';
-                            // } else if (header.column.id === 'available') {
-                            //   widthClass =
-                            //     showSales && showProfit
-                            //       ? 'w-auto px-4'
-                            //       : showSales || showProfit
-                            //         ? 'w-[206px]'
-                            //         : 'w-[198px]';
-                            // } else if (header.column.id === 'sales') {
-                            //   widthClass = showSales ? 'w-[30px]' : 'w-auto ';
-                            // } else if (header.column.id === 'profitGroup') {
-                            //   widthClass = showProfit ? 'w-[350px]' : 'w-auto ';
-                            // }
+                            if (header.column.id === "name") {
+                              widthClass =
+                                showSales && showProfit
+                                  ? "max-w-[259px]"
+                                  : showSales
+                                  ? "max-w-[292px]"
+                                  : showProfit
+                                  ? "max-w-[292px]"
+                                  : "max-w-[374px] pl-4";
+                            } else if (header.column.id === "sell_price") {
+                              widthClass =
+                                showSales && showProfit
+                                  ? "w-auto px-4"
+                                  : showSales || showProfit
+                                  ? "w-[262px]"
+                                  : "w-[280px]";
+                            } else if (header.column.id === "available") {
+                              widthClass =
+                                showSales && showProfit
+                                  ? "w-auto px-4"
+                                  : showSales || showProfit
+                                  ? "w-[206px]"
+                                  : "w-[198px]";
+                            } else if (header.column.id === "sales") {
+                              widthClass = showSales ? "w-[30px]" : "w-auto ";
+                            } else if (header.column.id === "profitGroup") {
+                              widthClass = showProfit ? "w-[350px]" : "w-auto ";
+                            }
 
                             return (
                               <TableHead
                                 key={header.id}
                                 className={`text-[#090F1C] font-circular-medium text-center border-b border-r min-w-[100px] 
-    ${
-      (showSales && !["name", "sales", "actions"].includes(header.id)) ||
-      (showProfit && !["name", "profitGroup", "actions"].includes(header.id))
-        ? "hidden sm:table-cell"
-        : ""
-    } ${widthClass}`}
+                                ${
+                                  (showSales &&
+                                    !["name", "sales", "actions"].includes(
+                                      header.id
+                                    )) ||
+                                  (showProfit &&
+                                    ![
+                                      "name",
+                                      "profitGroup",
+                                      "actions",
+                                    ].includes(header.id))
+                                    ? "hidden sm:table-cell"
+                                    : ""
+                                } ${widthClass}`}
                               >
                                 {flexRender(
                                   header.column.columnDef.header,
@@ -1058,11 +1047,40 @@ const Page = () => {
                           <TableRow
                             key={index}
                             className="h-[50px] cursor-pointer"
-                            // onClick={() => handleRowClick(row.original)}
+                            onClick={() => row && handleRowClick(row.original)}
                           >
                             {row
-                              ? row.getVisibleCells().map((cell: any) => {
-                                  let cellWidthClass: string = "w-auto"; // Default width
+                              ? row.getVisibleCells().map((cell) => {
+                                  let cellWidthClass = "w-auto"; // Default width
+
+                                  if (cell.column.id === "name") {
+                                    cellWidthClass =
+                                      showSales && showProfit
+                                        ? "w-[259px]"
+                                        : showSales
+                                        ? "w-[292px]"
+                                        : showProfit
+                                        ? "w-[292px]"
+                                        : "w-[374px]";
+                                  } else if (
+                                    cell.column.id === "price" ||
+                                    cell.column.id === "available"
+                                  ) {
+                                    cellWidthClass =
+                                      showSales && showProfit
+                                        ? "w-auto px-4"
+                                        : showSales || showProfit
+                                        ? "w-[262px]"
+                                        : "w-[280px]";
+                                  } else if (cell.column.id === "sales") {
+                                    cellWidthClass = showSales
+                                      ? "w-[356px]"
+                                      : "w-auto px-3";
+                                  } else if (cell.column.id === "profit") {
+                                    cellWidthClass = showProfit
+                                      ? "w-[362px]"
+                                      : "w-auto px-3";
+                                  }
 
                                   return (
                                     <TableCell
@@ -1091,7 +1109,7 @@ const Page = () => {
                                     </TableCell>
                                   );
                                 })
-                              : columns.map((column: ColumnDef<StockItem>) => (
+                              : columns.map((column) => (
                                   <TableCell
                                     key={column.id}
                                     className="text-center border-r text-gray-400"
@@ -1109,7 +1127,7 @@ const Page = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell colSpan={columns.length} className="">
-                          {/* <PaginationFeature
+                          <PaginationFeature
                             totalItems={
                               isSearching
                                 ? filteredItems.length
@@ -1120,7 +1138,7 @@ const Page = () => {
                             totalPages={totalPages}
                             onPageChange={handlePageChange}
                             onItemsPerPageChange={handleItemsPerPageChange}
-                          /> */}
+                          />
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1150,43 +1168,48 @@ const Page = () => {
               />
             )}
           </div>
+          {/* Modals - Logout, DeleteItem, EditItem */}
+          <LogoutConfirmModal
+            open={isLogoutModalOpen}
+            onOpenChange={setIsLogoutModalOpen}
+            onCancel={() => setIsLogoutModalOpen(false)}
+          />
+          <DeleteItem
+            open={isDeleteModalOpen}
+            onOpenChange={setIsDeleteModalOpen}
+            onCancel={() => setIsDeleteModalOpen(false)}
+            onDelete={handleDeleteItem}
+            selectedItem={
+              selectedItem
+                ? { product_id: selectedItem.product_id ?? "" }
+                : undefined
+            }
+          />
+          <EditItemModal
+            isOpen={openEdit}
+            onClose={closeEditModal}
+            item={selectedItem!}
+            onSave={handleSaveEdit}
+          />
+          <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">Test Page</h1>
+            <Button
+              onClick={() => setShowStockPreference(!showStockPreference)}
+              className="px-6 py-3 text-base cursor-pointer"
+            >
+              {showStockPreference
+                ? "Hide Stock Preference"
+                : "Show Stock Preference"}
+            </Button>
+
+            {showStockPreference && (
+              <div className="mt-6">
+                <StockPreference />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {showSettings ? (
-        <div>
-          <div className="mb-4">
-            <button
-              onClick={handleBackToStock}
-              className="flex items-center text-[#009A49] hover:underline"
-            >
-              ← Back to Stock
-            </button>
-          </div>
-          <Settings />
-        </div>
-      ) : (
-        <TableContent
-          stockItems={stockItems}
-          setStockItems={setStockItems}
-          handleInputChange={handleInputChange}
-          handleInlineEdit={handleInlineEdit}
-          handleSaveInline={handleSaveInline}
-          editedItem={editedItem}
-          isEditingTransition={isEditingTransition}
-          activeField={activeField}
-          cancelEdit={cancelEdit}
-        />
-      )}
-
-      <EditItemModal
-        isOpen={openEdit}
-        onClose={closeEditModal}
-        item={selectedItem!}
-        onSave={handleSaveEdit}
-      />
-
-      <Footer />
     </main>
   );
 };
