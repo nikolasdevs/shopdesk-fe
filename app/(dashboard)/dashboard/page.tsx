@@ -299,7 +299,7 @@ const Page = () => {
 
   const handleInputChange = useCallback(
     (field: keyof StockItem, value: string) => {
-      console.log("Input changed:", field, value);
+      console.log('Input changed:', field, value);
       if (editedItem) {
         setEditedItem((prev) => ({
           ...prev!,
@@ -314,17 +314,6 @@ const Page = () => {
     [editedItem]
   );
 
-  const handleInlineEdit = useCallback(
-    (item: StockItem, field: keyof StockItem = "name") => {
-      console.log("Inline edit started:", item.id, field);
-      setIsEditingTransition(item.id);
-      setEditedItem({ ...item });
-      setActiveField(field);
-      setIsEditingTransition(null);
-    },
-    []
-  );
-
   const cancelEdit = useCallback(() => {
     setEditedItem(null);
     setActiveField(null);
@@ -333,7 +322,7 @@ const Page = () => {
   const handleSaveInline = async () => {
     if (!editedItem) return;
 
-    console.log("Saving inline edit:", editedItem);
+    console.log('Saving inline edit:', editedItem);
 
     const organization_id = organizationId;
     try {
