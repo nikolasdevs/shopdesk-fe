@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
-import Image from "next/image";
+import { getAccessToken } from "@/app/api/token";
+import PaginationFeature from "@/components/functional/paginationfeature";
+import Sidebar from "@/components/functional/sidebar";
+import ImageUploader from "@/components/modal/add-image";
+import AddItemModal from "@/components/modal/add-item";
 import {
   Table,
   TableBody,
@@ -10,22 +13,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  flexRender,
-  useReactTable,
-  getCoreRowModel,
-  ColumnDef,
-} from "@tanstack/react-table";
-import { Search, Plus, X, Loader2 } from "lucide-react";
-import { FaSortDown } from "react-icons/fa";
-import { StockItem } from "../page";
-import Sidebar from "@/components/functional/sidebar";
-import PaginationFeature from "@/components/functional/paginationfeature";
-import AddItemModal from "@/components/modal/add-item";
-import ImageUploader from "@/components/modal/add-image";
 import box from "@/public/icons/box.svg";
 import { useStore } from "@/store/useStore";
-import { getAccessToken } from "@/app/api/token";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Loader2, Plus, Search, X } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaSortDown } from "react-icons/fa";
+import { StockItem } from "../../../../components/stock-components/page";
 
 // Add the ColumnMeta interface declaration
 declare module "@tanstack/react-table" {

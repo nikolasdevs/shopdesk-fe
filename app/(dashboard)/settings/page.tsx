@@ -13,12 +13,13 @@ import user from "@/public/icons/_ui-user-edit.svg";
 import deleteIcon from "@/public/icons/_ui-trash-03-red.svg";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
-import Account from "./Account";
-import Buisness from "./Buisness";
-import StockPreference from "./stockpreference";
-import Notification from "./notification";
-import Billing from "./billing";
-import UserPermission from "./userpermission";
+import Account from "../dashboard/components/Account";
+import Buisness from "../dashboard/components/Buisness";
+import StockPreference from "../dashboard/components/stockpreference";
+import Notification from "../dashboard/components/notification";
+import Billing from "../dashboard/components/billing";
+import UserPermission from "../dashboard/components/userpermission";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 function Settings() {
   const [searchText, setSearchText] = useState("");
@@ -26,6 +27,7 @@ function Settings() {
 
   return (
     <div className="space-y-8 w-full h-full md:mt-8 mt-4">
+          <DashboardHeader />
       <div className="space-y-0 w-full ">
         <Tabs defaultValue="account" className="w-auto gap-0 ">
           <div className="gap-4 items-center hidden lg:flex ">

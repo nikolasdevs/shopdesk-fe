@@ -1,4 +1,4 @@
-import { StockItem } from "@/app/(dashboard)/dashboard/page";
+import { StockItem } from "@/components/stock-components/page";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { FaTimes, FaChevronDown, FaSearch } from "react-icons/fa";
+import React, { useEffect, useRef, useState } from "react";
+import { FaChevronDown, FaSearch, FaTimes } from "react-icons/fa";
 import { currencies } from "../add-item";
 //import { editPrice } from '@/services/stock'
-import { StockItem } from "@/app/(dashboard)/dashboard/page";
+import { StockItem } from "@/components/stock-components/page";
 
 interface EditPriceModalProps {
   isOpen: boolean;
