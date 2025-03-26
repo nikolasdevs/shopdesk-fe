@@ -47,7 +47,7 @@ export const columns: ColumnDef<Sale>[] = [
         </p>
       );
     },
-    size: 250,
+   
   },
   {
     accessorKey: "quantitySold",
@@ -63,7 +63,7 @@ export const columns: ColumnDef<Sale>[] = [
         </div>
       );
     },
-    size: 250,
+ 
   },
   {
     accessorKey: "sellPrice",
@@ -79,7 +79,7 @@ export const columns: ColumnDef<Sale>[] = [
         />
       </div>
     ),
-    size: 250,
+  
   },
   {
     accessorKey: "profit",

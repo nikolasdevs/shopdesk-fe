@@ -102,9 +102,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                     data-state={row.getIsSelected() && "selected"}
-                    className={`hover:bg-gray-50 cursor-pointer overflow-x-auto grid grid-cols-4 border-b border-gray-200 first:h-11 . ${
-                      row.original.itemName === "Total" ? "" : ""
-                    }`}
+                    className={`hover:bg-gray-50 cursor-pointer overflow-x-auto grid grid-cols-4 border-b border-gray-200 first:h-11 `}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
