@@ -134,7 +134,7 @@ export default function Page() {
         {groupedData.map((group) => (
           <div
             key={group.timeKey}
-            className="border border-gray-200 rounded-lg"
+            className="border border-gray-200 rounded-lg mt-10 "
           >
             <DataTable
               data={[group.total, ...group.items]}

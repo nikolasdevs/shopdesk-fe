@@ -30,11 +30,11 @@ export const columns: ColumnDef<Sale>[] = [
 
       if (isTotal) {
         return (
-          <div className="flex justify-between items-center h-full relative">
+          <div className="flex justify-between items-center relative h-11">
             <div className="text-sm text-gray-600 px-5 h-full border-t-0 border-l-0 rounded-tr-[0.625rem] rounded-tl-[0.625rem] border-[#DEE5ED] w-3/4 text-center flex justify-center items-center border-solid border-b-0 border">
               {row.original.date} {row.original.time}
             </div>
-            <div className="font-semibold px-5 before:absolute before:w-20 before:h-4 before:bg-white before:-top-2  before:right-0">
+            <div className="font-semibold px-5 before:absolute before:w-20 before:h-4 before:bg-black before:-top-6  before:right-0 before:content-['']">
               Total
             </div>
           </div>
@@ -47,7 +47,6 @@ export const columns: ColumnDef<Sale>[] = [
         </p>
       );
     },
-   
   },
   {
     accessorKey: "quantitySold",
@@ -56,14 +55,13 @@ export const columns: ColumnDef<Sale>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="w-full">
+        <div className="w-full h-11">
           <p className="border-none p-5 rounded-none text-sm w-full h-full focus-visible:outline-none focus-visible:border-2 focus-visible:ring-[#B2E1C8] focus-visible:z-10 relative">
             {row.original.quantitySold}
           </p>
         </div>
       );
     },
- 
   },
   {
     accessorKey: "sellPrice",
@@ -71,7 +69,7 @@ export const columns: ColumnDef<Sale>[] = [
       <DataTableColumnHeader column={column} title="SELL. PRICE" />
     ),
     cell: ({ row }) => (
-      <div className="w-full">
+      <div className="w-full h-11">
         <EditableCell
           value={row.getValue("sellPrice")}
           currency="NGN"
@@ -79,7 +77,6 @@ export const columns: ColumnDef<Sale>[] = [
         />
       </div>
     ),
-  
   },
   {
     accessorKey: "profit",
@@ -87,7 +84,7 @@ export const columns: ColumnDef<Sale>[] = [
       <DataTableColumnHeader column={column} title="SHOW PROFIT" />
     ),
     cell: ({ row }) => (
-      <div className="w-full text-right">
+      <div className="w-full text-right h-11">
         {row.getValue("profit") ? (
           <EditableCell
             value={row.getValue("profit")}

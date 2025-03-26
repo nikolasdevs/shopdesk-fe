@@ -83,7 +83,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-red-500 "
+                  className="h-24 text-center text-red-500"
                 >
                   {error}
                 </TableCell>
@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
             ) : (
               table.getRowModel().rows.map((row) =>
                 row.original.isSpacer ? (
-                  <TableRow key={row.id} className="h-4">
+                  <TableRow key={row.id} className="h-7">
                     <TableCell
                       colSpan={columns.length}
                       className="border-none bg-transparent h-15 border-r-0 border-l-0"
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className={`px-4 py-3 text-sm text-gray-800  border-r border-gray-200 last:border-r-0 h-full`}
+                        className={`px-4 py-3 text-sm text-gray-800 border-r border-gray-200 last:border-r-0 h-11`}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
